@@ -1,7 +1,7 @@
 import type { PrecisionOptions } from "#lib/interpreter";
-import type { Value } from "#lib/utils/types";
+import type { NormalValue, ValueConstant } from "#lib/utils/types";
 
-const getConstantStr = (coeff: string, c?: Value["c"]) => {
+const getConstantStr = (coeff: string, c?: ValueConstant) => {
   if (!c) return coeff;
   if (coeff === "0") return "0";
   if (coeff === "1") return c;
@@ -12,7 +12,7 @@ const getConstantStr = (coeff: string, c?: Value["c"]) => {
 /**
  * Converts Result to a Decimal or Fraction String.
  */
-function formatResult(v: Value, options: PrecisionOptions = {}): string {
+function formatResult(v: NormalValue, options: PrecisionOptions = {}): string {
   const { n, d, c } = v;
 
   if (d === 0n) return "NaN";

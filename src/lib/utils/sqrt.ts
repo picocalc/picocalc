@@ -1,5 +1,6 @@
 import { InterpreterError } from "../errors";
 import { simplify } from "./simplify";
+import { OverflowValue } from "./types";
 import type { Value } from "./types";
 
 /**
@@ -37,6 +38,9 @@ export function sqrt(
   precise: boolean = false,
   precisionDigits: number = 100,
 ): Value {
+  if (v.n === "OVERFLOW") {
+    return OverflowValue;
+  }
   if (v.n < 0n) {
     throw new InterpreterError("Square root of negative not supported yet.");
   }

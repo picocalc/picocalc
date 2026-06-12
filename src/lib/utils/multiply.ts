@@ -1,9 +1,17 @@
 import { gcd } from "./gcd";
+import { OverflowValue } from "./types";
 import type { Value } from "./types";
 
 export function multiply(a: Value, b: Value): Value {
-  if (a.n === 0n || b.n === 0n) {
+  const aN = a.n;
+  const bN = b.n;
+
+  if (aN === 0n || bN === 0n) {
     return { n: 0n, d: 1n };
+  }
+
+  if (aN === "OVERFLOW" || bN === "OVERFLOW") {
+    return OverflowValue;
   }
 
   let n;
@@ -11,12 +19,12 @@ export function multiply(a: Value, b: Value): Value {
   let c;
 
   if (a.d === 1n && b.d === 1n) {
-    n = a.n * b.n;
+    n = aN * bN;
     d = 1n;
   } else {
-    const g1 = gcd(a.n, b.d);
-    const g2 = gcd(b.n, a.d);
-    n = (a.n / g1) * (b.n / g2);
+    const g1 = gcd(aN, b.d);
+    const g2 = gcd(bN, a.d);
+    n = (aN / g1) * (bN / g2);
     d = (a.d / g2) * (b.d / g1);
   }
 

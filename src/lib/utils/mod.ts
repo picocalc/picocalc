@@ -1,10 +1,10 @@
 import { gcd } from "./gcd";
-import type { Value } from "./types";
+import type { NormalValue } from "./types";
 
 /**
  * Calculates remainder of division.
  */
-export function mod(a: Value, b: Value): Value {
+export function mod(a: NormalValue, b: NormalValue): NormalValue {
   const d = (a.d * b.d) / gcd(a.d, b.d);
 
   const n1 = a.n * (d / a.d);

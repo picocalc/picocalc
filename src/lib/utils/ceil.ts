@@ -1,10 +1,10 @@
 import { simplify } from "./simplify";
-import type { Value } from "./types";
+import type { NormalValue } from "./types";
 
 /**
- * Returns the smallest integer greater than or equal to a Value.
+ * Returns the smallest integer greater than or equal to the value.
  */
-export function ceil(v: Value): bigint {
+export function ceil(v: NormalValue): bigint {
   const { n, d } = simplify(v);
   if (d === 1n) return n;
 

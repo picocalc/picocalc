@@ -1,10 +1,10 @@
 import { simplify } from "./simplify";
-import type { Value } from "./types";
+import type { NormalValue } from "./types";
 
 /**
- * Returns the largest integer less than or equal to a Value.
+ * Returns the largest integer less than or equal to the value.
  */
-export function floor(v: Value): bigint {
+export function floor(v: NormalValue): bigint {
   const { n, d } = simplify(v);
   if (d === 1n) return n;
 

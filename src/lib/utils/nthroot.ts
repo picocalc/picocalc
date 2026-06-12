@@ -1,6 +1,6 @@
 import { DivisionByZeroError, InterpreterError } from "../errors";
 import { simplify } from "./simplify";
-import type { Value } from "./types";
+import type { NormalValue } from "./types";
 
 /**
  * Calculates the integer nth root of a BigInt.
@@ -33,14 +33,14 @@ function iNthRoot(value: bigint, n: bigint): bigint {
 }
 
 /**
- * Calculates the n-th root of a Value (fraction).
+ * Calculates the n-th root of a fraction.
  */
 export function nthRoot(
-  v: Value,
+  v: NormalValue,
   root: bigint,
   precise: boolean = false,
   precisionDigits: number = 100,
-): Value {
+): NormalValue {
   if (root === 0n) {
     throw new DivisionByZeroError();
   }
