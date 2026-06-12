@@ -312,6 +312,16 @@ describe("evaluate", () => {
     expect(calculate("ceil(e)")).toBe("3");
   });
 
+  it("should handle floor function in precise mode", () => {
+    expect(calculate("floor(pi)", { format: "precise" })).toBe("3");
+    expect(calculate("floor(e)", { format: "precise" })).toBe("2");
+  });
+
+  it("should handle ceil function in precise mode", () => {
+    expect(calculate("ceil(pi)", { format: "precise" })).toBe("4");
+    expect(calculate("ceil(e)", { format: "precise" })).toBe("3");
+  });
+
   it("should handle sqrt function", () => {
     expect(calculate("sqrt(0)")).toBe("0");
     expect(calculate("sqrt(1)")).toBe("1");
