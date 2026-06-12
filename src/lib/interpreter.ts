@@ -343,18 +343,14 @@ export function evaluate(
 
         // Handling negative exponents: flip the fraction and make exponent positive
         if (exponent < 0) {
-          if (lC !== undefined) {
-            const c = getConst(lC);
-            baseN = baseN * c.n ** lE;
-            baseD = baseD * c.d ** lE;
-          }
-
           [baseN, baseD] = [baseD, baseN];
           exponent = -exponent;
 
           if (lC !== undefined) {
             resN = baseN ** exponent;
             resD = baseD ** exponent;
+            resC = lC;
+            resE = exp;
             break;
           }
         }
