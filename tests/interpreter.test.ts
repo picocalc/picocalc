@@ -394,8 +394,8 @@ describe("evaluate", () => {
   });
 
   it("should handle square root of a constant in precise mode", () => {
-    expect(calculate("pi^0.5", { format: "precise" })).toBe("pi");
-    expect(calculate("pi^(1/2)", { format: "precise" })).toBe("pi");
+    expect(calculate("(pi^2)^0.5", { format: "precise" })).toBe("pi");
+    expect(calculate("(pi^2)^(1/2)", { format: "precise" })).toBe("pi");
     expect(calculate("sqrt(pi^2)", { format: "precise" })).toBe("pi");
   });
 
