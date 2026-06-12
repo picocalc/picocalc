@@ -144,13 +144,7 @@ export function evaluate(
             values.push(OverflowValue);
             return;
           }
-          if (right.c === undefined) {
-            values.push(sqrt(right, format === "precise"));
-            return;
-          }
-          const c = getConst(right.c);
-          const v = multiply(right, c);
-          values.push(sqrt(v, format === "precise"));
+          values.push(sqrt(right, format === "precise"));
           return;
         }
       }

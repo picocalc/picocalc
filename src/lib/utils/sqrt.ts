@@ -52,7 +52,12 @@ export function sqrt(
     const [dIsSquare, dRoot] = isPerfectSquare(v.d);
 
     if (nIsSquare && dIsSquare) {
-      return simplify({ n: nRoot, d: dRoot });
+      return simplify({
+        n: nRoot,
+        d: dRoot,
+        c: v.c,
+        e: v.e ? v.e / 2n : undefined,
+      });
     }
   }
 

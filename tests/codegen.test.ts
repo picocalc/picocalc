@@ -39,4 +39,8 @@ describe("serialize", () => {
     expect(serialize(tokenize("2(3)"))).toEqual("2(3)");
     expect(serialize(tokenize("(2)(3)"))).toEqual("(2)(3)");
   });
+
+  it("should handle exponentiation correctly", () => {
+    expect(serialize(tokenize("2^3"))).toEqual("2^3");
+  });
 });

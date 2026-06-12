@@ -69,7 +69,12 @@ export function nthRoot(
     const rootD = iNthRoot(v.d, root);
 
     if (rootN ** root === v.n && rootD ** root === v.d) {
-      return simplify({ n: rootN, d: rootD });
+      return simplify({
+        n: rootN,
+        d: rootD,
+        c: v.c,
+        e: v.e ? v.e / root : undefined,
+      });
     }
   }
 
