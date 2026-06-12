@@ -286,12 +286,6 @@ export function evaluate(
 
         let exponent = normalizedExponent.n;
 
-        if (exponent === 0n) {
-          resN = 1n;
-          resD = 1n;
-          break;
-        }
-
         if (lN === 0n) {
           if (exponent < 0) {
             throw new DivisionByZeroError();
@@ -314,11 +308,6 @@ export function evaluate(
             { n: basePowerN, d: basePowerD, c: lC, e: lC ? exp : undefined },
             format === "precise",
           );
-
-          if (rootResult.n === "OVERFLOW") {
-            values.push(OverflowValue);
-            return;
-          }
 
           values.push(rootResult);
           return;

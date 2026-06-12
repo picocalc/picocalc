@@ -511,6 +511,8 @@ describe("evaluate - error handling", () => {
   it("should throw MaximumPrecisionError for very large scale", () => {
     const hugeDecimal = "0." + "0".repeat(100_000) + "1";
     expect(() => calculate(hugeDecimal)).toThrow(MaximumPrecisionError);
+    const bigNumber = "1" + "0".repeat(100_000);
+    expect(() => calculate(`1e${bigNumber}`)).toThrow(MaximumPrecisionError);
   }, 200);
 
   it("should throw OverflowError for very large factorial", () => {
@@ -524,6 +526,19 @@ describe("evaluate - error handling", () => {
 
   it("should throw OverflowError for very large exponentiation", () => {
     expect(() => calculate("1e10000000")).toThrow(OverflowError);
+  }, 200);
+
+  it("should throw OverflowError when further handling overflowing numbers", () => {
+    expect(() => calculate("-10^10^10")).toThrow(OverflowError);
+    expect(() => calculate("abs(10^10^10)")).toThrow(OverflowError);
+    expect(() => calculate("ceil(10^10^10)")).toThrow(OverflowError);
+    expect(() => calculate("floor(10^10^10)")).toThrow(OverflowError);
+    expect(() => calculate("sqrt(10^10^10)")).toThrow(OverflowError);
+    expect(() => calculate("(10^10^10)!")).toThrow(OverflowError);
+    expect(() => calculate("(10^10^10) + 1")).toThrow(OverflowError);
+    expect(() => calculate("(10^10^10) ^ 10")).toThrow(OverflowError);
+    expect(() => calculate("10 ^ (10^10^10)")).toThrow(OverflowError);
+    expect(() => calculate("|(10^10^10)|")).toThrow(OverflowError);
   }, 200);
 });
 
