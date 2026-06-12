@@ -11,6 +11,7 @@ import {
 } from "./errors";
 import type { ParsedToken } from "./parser";
 import { ceil } from "./utils/ceil";
+import { divide } from "./utils/divide";
 import { factorial } from "./utils/factorial";
 import { floor } from "./utils/floor";
 import { gcd } from "./utils/gcd";
@@ -235,37 +236,12 @@ export function evaluate(
       }
       case "MULTIPLY":
       case "IMPLICIT_MUL": {
-        const result = multiply(left, right);
-        if (result.n === "OVERFLOW") {
-          values.push(OverflowValue);
-          return;
-        }
-        values.push(result);
+        values.push(multiply(left, right));
         return;
       }
       case "DIVIDE": {
-        if (rN === 0n) {
-          throw new DivisionByZeroError();
-        }
-        if (lN === 0n) {
-          values.push({ n: 0n, d: 1n });
-          return;
-        }
-        if (lN === "OVERFLOW" || rN === "OVERFLOW") {
-          values.push(OverflowValue);
-          return;
-        }
-        const g1 = gcd(lN, rN);
-        const lD = left.d;
-        const lC = left.c;
-        const rD = right.d;
-        const g2 = gcd(rD, lD);
-        resN = (lN / g1) * (rD / g2);
-        resD = (lD / g2) * (rN / g1);
-        if (lC !== undefined && right.c === undefined) {
-          resC = lC;
-        }
-        break;
+        values.push(divide(left, right));
+        return;
       }
       case "MOD": {
         if (rN === 0n) {
