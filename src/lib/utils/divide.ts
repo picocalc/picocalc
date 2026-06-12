@@ -22,7 +22,6 @@ export function divide(left: Value, right: Value): Value {
 
   const g1 = gcd(lN, rN);
   const lD = left.d;
-  const lC = left.c;
   const rD = right.d;
   const g2 = gcd(rD, lD);
 
@@ -30,9 +29,35 @@ export function divide(left: Value, right: Value): Value {
   const resD = (lD / g2) * (rN / g1);
 
   let resC: ValueConstant | undefined;
-  if (lC !== undefined && right.c === undefined) {
-    resC = lC;
+  let resE: bigint | undefined;
+
+  // Handle constants
+  if (left.c !== undefined && right.c === undefined) {
+    resC = left.c;
+  } else if (left.c === undefined && right.c !== undefined) {
+    resC = right.c;
+  } else if (left.c === right.c) {
+    resC = left.c;
   }
 
-  return { n: resN, d: resD, c: resC };
+  // Handle exponents (Subtract right from left during division)
+  const lE = left.e ?? (left.c !== undefined ? 1n : undefined);
+  const rE = right.e ?? (right.c !== undefined ? 1n : undefined);
+
+  if (lE !== undefined && rE !== undefined) {
+    if (left.c === right.c) {
+      resE = lE - rE;
+      // If exponents cancel out completely (e.g., π^1 / π^1 = π^0), drop the constant
+      if (resE === 0n) {
+        resC = undefined;
+        resE = undefined;
+      }
+    }
+  } else if (lE !== undefined) {
+    resE = lE;
+  } else if (rE !== undefined) {
+    resE = -rE; // Moving from denominator to numerator negates the exponent
+  }
+
+  return { n: resN, d: resD, c: resC, e: resE };
 }
