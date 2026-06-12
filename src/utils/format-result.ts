@@ -26,7 +26,7 @@ function formatResult(v: NormalValue, options: PrecisionOptions = {}): string {
 
   const maxDecimals = options.maxDecimals ?? 30;
 
-  const isNegative = n < 0n;
+  const isNegative = n < 0;
   const absN = isNegative ? -n : n;
 
   const integerPart = (absN / d).toString();

@@ -119,7 +119,7 @@ export function evaluate(
             values.push(OverflowValue);
             return;
           }
-          values.push({ n: rN < 0n ? -rN : rN, d: right.d, c: right.c });
+          values.push({ n: rN < 0 ? -rN : rN, d: right.d, c: right.c });
           return;
         }
         case "CEIL_FN": {
@@ -161,7 +161,7 @@ export function evaluate(
         return;
       }
       const reduced = simplify(right);
-      if (reduced.d !== 1n || reduced.n < 0n) {
+      if (reduced.d !== 1n || reduced.n < 0) {
         throw new InterpreterError(
           "Factorial is only defined for non-negative integers",
           pos,
@@ -317,7 +317,7 @@ export function evaluate(
         }
 
         if (lN === 0n) {
-          if (exponent < 0n) {
+          if (exponent < 0) {
             throw new DivisionByZeroError();
           }
           resN = 0n;
@@ -366,7 +366,7 @@ export function evaluate(
         let baseD = lD;
 
         // Handling negative exponents: flip the fraction and make exponent positive
-        if (exponent < 0n) {
+        if (exponent < 0) {
           if (lC !== undefined) {
             const c = getConst(lC);
             baseN = baseN * c.n ** lE;
@@ -531,7 +531,7 @@ export function evaluate(
           break;
         }
 
-        values.push({ n: val.n < 0n ? -val.n : val.n, d: val.d, c: val.c });
+        values.push({ n: val.n < 0 ? -val.n : val.n, d: val.d, c: val.c });
         break;
       }
       case "PLUS": {
