@@ -393,6 +393,12 @@ describe("evaluate", () => {
     expect(calculate("1/pi", { format: "precise" })).toBe("1/pi");
   });
 
+  it("should handle square root of a constant in precise mode", () => {
+    expect(calculate("pi^0.5", { format: "precise" })).toBe("pi");
+    expect(calculate("pi^(1/2)", { format: "precise" })).toBe("pi");
+    expect(calculate("sqrt(pi^2)", { format: "precise" })).toBe("pi");
+  });
+
   it("should handle simple division of constants", () => {
     expect(calculate("pi/pi")).toBe("1");
     expect(calculate("e/e")).toBe("1");
