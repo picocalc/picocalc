@@ -1,4 +1,4 @@
-import { DivisionByZeroError } from "#lib/errors";
+import { DivisionByZeroError } from "../errors";
 
 import { gcd } from "./gcd";
 import { OverflowValue } from "./types";
