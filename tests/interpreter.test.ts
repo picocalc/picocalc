@@ -367,6 +367,11 @@ describe("evaluate", () => {
     expect(calculate("2pi^2", { maxDecimals: 4 })).toBe("19.7392");
   });
 
+  it("should handle exponentiation of a constant in precise mode", () => {
+    expect(calculate("pi^2", { format: "precise" })).toBe("pi^2");
+    expect(calculate("2pi^2", { format: "precise" })).toBe("2pi^2");
+  });
+
   it("should handle simple division of constants", () => {
     expect(calculate("pi/pi")).toBe("1");
     expect(calculate("e/e")).toBe("1");
