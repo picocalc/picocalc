@@ -224,7 +224,15 @@ describe("evaluate", () => {
     expect(calculate("1^1")).toBe("1");
     expect(calculate("1^0.5")).toBe("1");
     expect(calculate("1^(1/3)")).toBe("1");
+    expect(calculate("1^(2/3)")).toBe("1");
     expect(calculate("1 ^ 1e100")).toBe("1");
+  });
+
+  it("should handle exponentiating to 0", () => {
+    expect(calculate("0.5^0")).toBe("1");
+    expect(calculate("(1/3)^0")).toBe("1");
+    expect(calculate("(2/3)^0")).toBe("1");
+    expect(calculate("1e100^0")).toBe("1");
   });
 
   it("should handle a simple remainder division", () => {
@@ -442,13 +450,16 @@ describe("evaluate", () => {
   });
 
   it("should not throw OverflowError for calculatable results", () => {
-    const overflowing = "10^1e10";
+    const overflowing = "(10^1e10)";
 
     expect(() => calculate(`0 * ${overflowing}`)).not.toThrow(OverflowError);
     expect(calculate(`0 * ${overflowing}`)).toBe("0");
 
     expect(() => calculate(`1 ^ ${overflowing}`)).not.toThrow(OverflowError);
     expect(calculate(`1 ^ ${overflowing}`)).toBe("1");
+
+    expect(() => calculate(`${overflowing} ^ 0`)).not.toThrow(OverflowError);
+    expect(calculate(`${overflowing} ^ 0`)).toBe("1");
   });
 });
 

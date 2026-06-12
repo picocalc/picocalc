@@ -280,6 +280,12 @@ export function evaluate(
         break;
       }
       case "EXP": {
+        if (rN === 0n) {
+          resN = 1n;
+          resD = 1n;
+          break;
+        }
+
         if (lN === "OVERFLOW") {
           values.push(OverflowValue);
           return;
