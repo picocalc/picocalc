@@ -235,6 +235,11 @@ describe("evaluate", () => {
     expect(calculate("1e100^0")).toBe("1");
   });
 
+  it("should handle exponentiating to 1", () => {
+    expect(calculate("0.5^1")).toBe("0.5");
+    expect(calculate("2^1")).toBe("2");
+  });
+
   it("should handle a simple remainder division", () => {
     expect(calculate("5 % 3")).toBe("2");
     expect(calculate("10 % 3")).toBe("1");
