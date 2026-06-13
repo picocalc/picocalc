@@ -68,14 +68,9 @@ export function nthRoot(
   if (precise) {
     const rootN = iNthRoot(v.n, n);
     const rootD = iNthRoot(v.d, n);
-
     if (rootN ** n === v.n && rootD ** n === v.d) {
-      return simplify({
-        n: rootN,
-        d: rootD,
-        c: v.c,
-        e: v.e ? { n: v.e.n / n } : undefined,
-      });
+      const e = simplify({ n: v.e?.n ?? 1n, d: (v.e?.d ?? 1n) * n });
+      return simplify({ n: rootN, d: rootD, c: v.c, e });
     }
   }
 
