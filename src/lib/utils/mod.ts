@@ -1,3 +1,4 @@
+import { DivisionByZeroError } from "../errors";
 import { gcd } from "./gcd";
 import type { NormalValue } from "./types";
 
@@ -5,6 +6,10 @@ import type { NormalValue } from "./types";
  * Calculates remainder of division.
  */
 export function mod(a: NormalValue, b: NormalValue): NormalValue {
+  if (b.n === 0n) {
+    throw new DivisionByZeroError();
+  }
+
   const d = (a.d * b.d) / gcd(a.d, b.d);
 
   const n1 = a.n * (d / a.d);

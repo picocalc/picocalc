@@ -228,17 +228,12 @@ export function evaluate(
         return;
       }
       case "MOD": {
-        if (rN === 0n) {
-          throw new DivisionByZeroError();
-        }
         if (lN === "OVERFLOW" || rN === "OVERFLOW") {
           values.push(OverflowValue);
           return;
         }
-        const { n, d } = mod({ n: lN, d: left.d }, { n: rN, d: right.d });
-        resN = n;
-        resD = d;
-        break;
+        values.push(mod(left, right));
+        return;
       }
       case "EXP": {
         if (rN === 0n) {

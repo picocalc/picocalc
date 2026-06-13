@@ -37,7 +37,7 @@ function formatResult(v: NormalValue, options: PrecisionOptions = {}): string {
     return formatPrecise(v);
   }
 
-  const maxDecimals = options.maxDecimals ?? 30;
+  const { maxDecimals = 30 } = options;
 
   const isNegative = n < 0;
   const absN = isNegative ? -n : n;
