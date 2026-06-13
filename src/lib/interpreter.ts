@@ -90,7 +90,7 @@ export function evaluate(
   const values: Value[] = [];
   const ops: StackOp[] = [];
 
-  const applyOp = (pos?: number) => {
+  const applyOp = (pos?: number): void => {
     const op = ops.pop();
     if (!op || op === "LPAREN" || op === "ABS_OPEN") return;
 
@@ -133,8 +133,12 @@ export function evaluate(
           if (right.c) {
             const c = getConst(right.c);
             const e = right.e ?? 1n;
+            const isNegExp = e < 0;
+            const absE = isNegExp ? -e : e;
+            const cNe = isNegExp ? c.d ** absE : c.n ** absE;
+            const cDe = isNegExp ? c.n ** absE : c.d ** absE;
             values.push({
-              n: ceil({ n: c.n ** e * right.n, d: c.d ** e * right.d }),
+              n: ceil({ n: cNe * right.n, d: cDe * right.d }),
               d: 1n,
             });
             return;
@@ -150,8 +154,12 @@ export function evaluate(
           if (right.c) {
             const c = getConst(right.c);
             const e = right.e ?? 1n;
+            const isNegExp = e < 0;
+            const absE = isNegExp ? -e : e;
+            const cNe = isNegExp ? c.d ** absE : c.n ** absE;
+            const cDe = isNegExp ? c.n ** absE : c.d ** absE;
             values.push({
-              n: floor({ n: c.n ** e * right.n, d: c.d ** e * right.d }),
+              n: floor({ n: cNe * right.n, d: cDe * right.d }),
               d: 1n,
             });
             return;
@@ -399,7 +407,7 @@ export function evaluate(
     values.push(resD > SIMPLIFY_THRESHOLD ? simplify(value) : value);
   };
 
-  const pushOpWithPrecedence = (currentOp: StackOp, pos: number) => {
+  const pushOpWithPrecedence = (currentOp: StackOp, pos: number): void => {
     const isUnary = isUnaryOperation(currentOp);
 
     const isRightAssociative =
@@ -443,7 +451,7 @@ export function evaluate(
             values.push(OverflowValue);
             break;
           }
-          if (expValue >= 0n) {
+          if (expValue >= 0) {
             n *= 10n ** expValue;
           } else {
             d *= 10n ** -expValue;
