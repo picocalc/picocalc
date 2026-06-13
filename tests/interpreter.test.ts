@@ -164,8 +164,14 @@ describe("evaluate", () => {
   });
 
   it("should correctly multiply 2 constants in precise mode", () => {
-    expect(calculate(calculate("e pi", { format: "precise" }))).toBe(
+    expect(calculate(calculate("e * pi", { format: "precise" }))).toBe(
       calculate("e * pi"),
+    );
+  });
+
+  it("should correctly exponentiate 2 constants in precise mode", () => {
+    expect(calculate(calculate("e ^ pi", { format: "precise" }))).toBe(
+      calculate("e ^ pi"),
     );
   });
 
