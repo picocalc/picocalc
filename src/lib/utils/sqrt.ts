@@ -1,4 +1,4 @@
-import { InterpreterError } from "../errors";
+import { NotImplementedError } from "../errors";
 import { ZERO } from "./constants";
 import { simplify } from "./simplify";
 import type { Value } from "./types";
@@ -8,7 +8,9 @@ import type { Value } from "./types";
  */
 function isqrt(value: bigint): bigint {
   if (value < 0) {
-    throw new InterpreterError("Square root of negative not supported yet.");
+    throw new NotImplementedError(
+      "Square root of negative numbers is not implemented yet.",
+    );
   }
   if (value < 2n) return value;
 
@@ -41,7 +43,9 @@ export function sqrt(
   if (v.n === "OVERFLOW") return v;
 
   if (v.n < 0) {
-    throw new InterpreterError("Square root of negative not supported yet.");
+    throw new NotImplementedError(
+      "Square root of negative numbers is not implemented yet.",
+    );
   }
 
   if (v.n === 0n) return ZERO;

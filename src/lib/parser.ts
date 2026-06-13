@@ -76,6 +76,12 @@ export class IncompleteExpressionError extends ParserError {
   }
 }
 
+export class UnexpectedOperatorError extends ParserError {
+  constructor(message: string, pos: number) {
+    super(`Unexpected operator: ${message}`, pos);
+  }
+}
+
 function resolveIdentifier(token: TokenIdentifier): TokenConst | TokenFn {
   if (token.id === "pi" || token.id === "e") {
     return { type: "CONST", id: token.id, pos: token.pos };
@@ -141,7 +147,7 @@ export function parse(tokens: Token[]): ParsedToken[] {
     // --- Syntax Validation ---
     if (isBinaryOperator(token)) {
       if (isUnaryContext(prevParsed)) {
-        throw new ParserError(
+        throw new UnexpectedOperatorError(
           `Unexpected operator '${getSym(token)}'`,
           token.pos,
         );
@@ -150,7 +156,10 @@ export function parse(tokens: Token[]): ParsedToken[] {
 
     if (token.type === "FACTORIAL") {
       if (!isOperand(prevParsed) && prevParsed?.type !== "RPAREN") {
-        throw new ParserError("Unexpected factorial operator", token.pos);
+        throw new UnexpectedOperatorError(
+          "Unexpected factorial operator",
+          token.pos,
+        );
       }
     }
 
@@ -161,13 +170,16 @@ export function parse(tokens: Token[]): ParsedToken[] {
           prevParsed.type === "MINUS" ||
           isBinaryOperator(prevParsed))
       ) {
-        throw new ParserError(
+        throw new UnexpectedOperatorError(
           `Unexpected ')' after operator '${getSym(prevParsed)}'`,
           token.pos,
         );
       }
       if (prevParsed?.type === "LPAREN") {
-        throw new ParserError("Unexpected ')' after '('", token.pos);
+        throw new UnexpectedOperatorError(
+          "Unexpected ')' after '('",
+          token.pos,
+        );
       }
     }
 

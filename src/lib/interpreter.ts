@@ -1,11 +1,10 @@
 import {
-  UnexpectedEndOfExpressionError,
   MismatchedParenthesisError,
   InsufficientOperandsError,
-  InterpreterError,
   EmptyExpressionError,
   MaximumPrecisionError,
   OverflowError,
+  NotImplementedError,
 } from "./errors";
 import type { ParsedToken } from "./parser";
 import { ceil } from "./utils/ceil";
@@ -85,10 +84,7 @@ export function evaluate(
     const op = ops.pop();
     if (!op || op === "LPAREN" || op === "ABS_OPEN") return;
 
-    const right = values.pop();
-    if (right === undefined) {
-      throw new UnexpectedEndOfExpressionError();
-    }
+    const right = values.pop()!;
 
     if (isUnaryOperation(op)) {
       switch (op) {
@@ -146,8 +142,8 @@ export function evaluate(
       }
       const reduced = simplify(right);
       if (reduced.d !== 1n || reduced.n < 0) {
-        throw new InterpreterError(
-          "Factorial is only defined for non-negative integers",
+        throw new NotImplementedError(
+          "Factorial is only implemented for non-negative integers.",
           pos,
         );
       }
@@ -328,26 +324,14 @@ export function evaluate(
         break;
       }
       case "ABS_CLOSE": {
-        let foundMatch = false;
         while (ops.length > 0) {
           if (ops[ops.length - 1] === "ABS_OPEN") {
-            foundMatch = true;
             break;
           }
           applyOp(token.pos);
         }
-        if (!foundMatch) {
-          throw new InterpreterError(
-            "Mismatched absolute value pipe",
-            token.pos,
-          );
-        }
-
         ops.pop();
-        const val = values.pop();
-        if (val === undefined) {
-          throw new UnexpectedEndOfExpressionError();
-        }
+        const val = values.pop()!;
         if (val.n === "OVERFLOW") {
           values.push(OverflowValue);
           break;
@@ -430,10 +414,7 @@ export function evaluate(
     applyOp(lastPos);
   }
 
-  const finalValue = values.pop();
-  if (finalValue === undefined) {
-    throw new UnexpectedEndOfExpressionError();
-  }
+  const finalValue = values.pop()!;
 
   if (finalValue.n === "OVERFLOW") {
     throw new OverflowError();
