@@ -17,10 +17,10 @@ function formatPrecise(v: NormalValue): string {
   const isNegative = n < 0;
   const absN = isNegative ? -n : n;
   const numSign = isNegative ? "-" : "";
-  if (c && e && e < 0) {
-    return `${numSign}${absN.toString()}/${getConstantStr(d, c, e)}`;
+  if (c && e && e.n < 0) {
+    return `${numSign}${absN.toString()}/${getConstantStr(d, c, e.n)}`;
   }
-  const numeratorStr = getConstantStr(absN, c, e);
+  const numeratorStr = getConstantStr(absN, c, e?.n);
   if (d === 1n) return `${numSign}${numeratorStr}`;
   return `${numSign}${numeratorStr}/${d}`;
 }

@@ -25,7 +25,7 @@ export function divide(left: Value, right: Value): Value {
   const d = (lD / g2) * (rN / g1);
 
   let c: ValueConstant | undefined;
-  let e: bigint | undefined;
+  let nExp: bigint | undefined;
 
   // Handle constants
   if (left.c !== undefined && right.c === undefined) {
@@ -37,23 +37,25 @@ export function divide(left: Value, right: Value): Value {
   }
 
   // Handle exponents (Subtract right from left during division)
-  const lE = left.e ?? (left.c !== undefined ? 1n : undefined);
-  const rE = right.e ?? (right.c !== undefined ? 1n : undefined);
+  const lE = left.e?.n ?? (left.c !== undefined ? 1n : undefined);
+  const rE = right.e?.n ?? (right.c !== undefined ? 1n : undefined);
 
   if (lE !== undefined && rE !== undefined) {
     if (left.c === right.c) {
-      e = lE - rE;
+      nExp = lE - rE;
       // If exponents cancel out completely, drop the constant
-      if (e === 0n) {
+      if (nExp === 0n) {
         c = undefined;
-        e = undefined;
+        nExp = undefined;
       }
     }
   } else if (lE !== undefined) {
-    e = lE;
+    nExp = lE;
   } else if (rE !== undefined) {
-    e = -rE; // Moving from denominator to numerator negates the exponent
+    nExp = -rE; // Moving from denominator to numerator negates the exponent
   }
+
+  const e = nExp ? { n: nExp } : undefined;
 
   return { n, d, c, e };
 }

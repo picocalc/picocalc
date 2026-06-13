@@ -55,7 +55,7 @@ export function sqrt(
         n: nRoot,
         d: dRoot,
         c: v.c,
-        e: v.e ? v.e / 2n : undefined,
+        e: v.e ? { n: v.e.n / 2n } : undefined,
       });
     }
   }

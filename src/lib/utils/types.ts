@@ -3,18 +3,28 @@ type OverflowValue = { n: "OVERFLOW" };
 
 type ValueConstant = "pi" | "e";
 
-type NormalValue = {
+type Numerator = {
   /** Numerator */
   n: bigint;
-  /** Denominator */
+};
+
+type Denominator = {
+  /** Numerator */
   d: bigint;
+};
+
+type SimpleFraction = Numerator & Denominator;
+
+type ValueExponent = Numerator & Partial<Denominator>;
+
+type NormalValue = SimpleFraction & {
   /** Constant */
   c?: ValueConstant;
   /** Constant exponent */
-  e?: bigint;
+  e?: ValueExponent;
 };
 
 type Value = NormalValue | OverflowValue;
 
-export type { NormalValue, Value, ValueConstant };
+export type { NormalValue, Value, ValueConstant, SimpleFraction };
 export { OverflowValue };

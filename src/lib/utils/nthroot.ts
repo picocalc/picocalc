@@ -74,7 +74,7 @@ export function nthRoot(
         n: rootN,
         d: rootD,
         c: v.c,
-        e: v.e ? v.e / n : undefined,
+        e: v.e ? { n: v.e.n / n } : undefined,
       });
     }
   }

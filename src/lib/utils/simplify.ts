@@ -25,7 +25,7 @@ function toSimpleFraction(val: NormalValue): NormalValue {
   }
 
   const c = getConst(val.c);
-  const e = val.e ?? 1n;
+  const e = val.e?.n ?? 1n;
   const absE = e < 0 ? -e : e;
 
   const poweredConstant: NormalValue = {

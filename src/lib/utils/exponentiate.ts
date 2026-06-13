@@ -45,7 +45,7 @@ export function exponentiate(
     return simplify({ n: numerator, d: denominator, c });
   }
 
-  const exp = (left.e ?? 1n) * exponent;
+  const eN = (left.e?.n ?? 1n) * exponent;
 
   let baseN = lN;
   let baseD = lD;
@@ -61,7 +61,7 @@ export function exponentiate(
 
   const dExp = normalizedExp.d;
 
-  const e = c ? exp : undefined;
+  const e = c ? { n: eN } : undefined;
 
   if (exponent === dExp) {
     return { n: baseN, d: baseD, c, e };
