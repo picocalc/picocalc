@@ -1,5 +1,6 @@
 import { ZERO } from "./constants";
 import { gcd } from "./gcd";
+import { toSimpleFraction } from "./simplify";
 import type { NormalValue, Value, ValueConstant } from "./types";
 
 export function multiply<V extends Value>(a: V, b: V): V | NormalValue {
@@ -32,6 +33,8 @@ export function multiply<V extends Value>(a: V, b: V): V | NormalValue {
     c = a.c;
   } else if (a.c === b.c) {
     c = a.c;
+  } else {
+    return multiply(toSimpleFraction(a), toSimpleFraction(b));
   }
 
   const aExpN = a.e?.n;
