@@ -1,5 +1,4 @@
-import { DivisionByZeroError } from "#lib/errors";
-
+import { DivisionByZeroError } from "../errors";
 import { ZERO } from "./constants";
 import { nthRoot } from "./nthroot";
 import { simplify, toSimpleFraction } from "./simplify";
@@ -24,12 +23,26 @@ export function exponentiate(
   if (lN === lD && c === undefined) return { n: 1n, d: 1n };
   if (rN === "OVERFLOW") return right;
 
-  const normalizedExponent = toSimpleFraction(simplify(right));
-  let exponent = normalizedExponent.n;
+  const normalizedExp = toSimpleFraction(simplify(right));
+  let exponent = normalizedExp.n;
 
   if (lN === 0n) {
     if (exponent < 0) throw new DivisionByZeroError();
     return ZERO;
+  }
+
+  if (normalizedExp.d >= 100) {
+    const baseFloat = Number(lN) / Number(lD);
+    const expFloat = Number(normalizedExp.n) / Number(normalizedExp.d);
+    const resultFloat = baseFloat ** expFloat;
+    if (!Number.isFinite(resultFloat)) return OverflowValue;
+    const [integerPart, fractionalPart] = resultFloat.toString().split(".");
+    if (!fractionalPart) {
+      return simplify({ n: BigInt(integerPart!), d: 1n, c });
+    }
+    const denominator = 10n ** BigInt(fractionalPart.length);
+    const numerator = BigInt(integerPart + fractionalPart);
+    return simplify({ n: numerator, d: denominator, c });
   }
 
   const exp = (left.e ?? 1n) * exponent;
@@ -46,7 +59,7 @@ export function exponentiate(
     return OverflowValue;
   }
 
-  const dExp = normalizedExponent.d;
+  const dExp = normalizedExp.d;
 
   const e = c ? exp : undefined;
 

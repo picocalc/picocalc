@@ -240,6 +240,16 @@ describe("evaluate", () => {
     expect(calculate("2^1")).toBe("2");
   });
 
+  it("should handle exponentiation of decimals in decimal mode", () => {
+    const decimals = (maxDecimals: number) => ({
+      format: "decimal" as const,
+      maxDecimals,
+    });
+    expect(calculate("(1/3)^pi", decimals(12))).toBe("0.031701467835");
+    expect(calculate("e^pi", decimals(12))).toBe("23.140692632779");
+    expect(calculate("pi^(1/3)", decimals(15))).toBe("1.464591887561523");
+  });
+
   it("should handle a simple remainder division", () => {
     expect(calculate("5 % 3")).toBe("2");
     expect(calculate("10 % 3")).toBe("1");
@@ -399,12 +409,12 @@ describe("evaluate", () => {
     expect(calculate("0e", { format: "precise" })).toBe("0");
   });
 
-  it("should handle a constant in non-precise mode", () => {
+  it("should handle a constant in decimal mode", () => {
     expect(calculate("pi")).toBe(PI);
     expect(calculate("e")).toBe(E);
   });
 
-  it("should handle exponentiation of a constant in non-precise mode", () => {
+  it("should handle exponentiation of a constant in decimal mode", () => {
     expect(calculate("pi^2", { maxDecimals: 4 })).toBe("9.8696");
     expect(calculate("2pi^2", { maxDecimals: 4 })).toBe("19.7392");
     expect(calculate("pi^-1", { maxDecimals: 4 })).toBe("0.3183");
@@ -419,7 +429,7 @@ describe("evaluate", () => {
     expect(calculate("abs(pi^2)", { format: "precise" })).toBe("pi^2");
   });
 
-  it("should handle multiplying constants in non-precise mode", () => {
+  it("should handle multiplying constants in decimal mode", () => {
     expect(calculate("pi * pi", { maxDecimals: 4 })).toBe("9.8696");
     expect(calculate("2 * pi * pi", { maxDecimals: 4 })).toBe("19.7392");
   });
