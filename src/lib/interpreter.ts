@@ -18,7 +18,7 @@ import { gcd } from "./utils/gcd";
 import { mod } from "./utils/mod";
 import { multiply } from "./utils/multiply";
 import { nthRoot } from "./utils/nthroot";
-import { simplify } from "./utils/simplify";
+import { simplify, toSimpleFraction } from "./utils/simplify";
 import { sqrt } from "./utils/sqrt";
 import { OverflowValue } from "./utils/types";
 import type { NormalValue, Value, ValueConstant } from "./utils/types";
@@ -122,20 +122,7 @@ export function evaluate(
             values.push(OverflowValue);
             return;
           }
-          if (right.c) {
-            const c = getConst(right.c);
-            const e = right.e ?? 1n;
-            const isNegExp = e < 0;
-            const absE = isNegExp ? -e : e;
-            const cNe = isNegExp ? c.d ** absE : c.n ** absE;
-            const cDe = isNegExp ? c.n ** absE : c.d ** absE;
-            values.push({
-              n: ceil({ n: cNe * right.n, d: cDe * right.d }),
-              d: 1n,
-            });
-            return;
-          }
-          values.push({ n: ceil(right), d: 1n });
+          values.push({ n: ceil(toSimpleFraction(right)), d: 1n });
           return;
         }
         case "FLOOR_FN": {
@@ -143,27 +130,10 @@ export function evaluate(
             values.push(OverflowValue);
             return;
           }
-          if (right.c) {
-            const c = getConst(right.c);
-            const e = right.e ?? 1n;
-            const isNegExp = e < 0;
-            const absE = isNegExp ? -e : e;
-            const cNe = isNegExp ? c.d ** absE : c.n ** absE;
-            const cDe = isNegExp ? c.n ** absE : c.d ** absE;
-            values.push({
-              n: floor({ n: cNe * right.n, d: cDe * right.d }),
-              d: 1n,
-            });
-            return;
-          }
-          values.push({ n: floor(right), d: 1n });
+          values.push({ n: floor(toSimpleFraction(right)), d: 1n });
           return;
         }
         case "SQRT_FN": {
-          if (right.n === "OVERFLOW") {
-            values.push(OverflowValue);
-            return;
-          }
           values.push(sqrt(right, format === "precise"));
           return;
         }
