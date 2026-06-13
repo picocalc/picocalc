@@ -8,7 +8,7 @@ export function floor(v: NormalValue): bigint {
   const { n, d } = simplify(v);
   if (d === 1n) return n;
 
-  const isNegative = n < 0n;
+  const isNegative = n < 0;
   const result = n / d;
   const hasRemainder = n % d !== 0n;
 

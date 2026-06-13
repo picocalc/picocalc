@@ -26,7 +26,7 @@ function getPrimes(limit: number): number[] {
  * Calculates factorial.
  */
 export function factorial(n: bigint): bigint | null {
-  if (n < 0n) return null;
+  if (n < 0) return null;
   if (n === 0n || n === 1n) return 1n;
 
   if (n < 1000n) {

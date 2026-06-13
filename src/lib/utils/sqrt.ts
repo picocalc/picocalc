@@ -7,7 +7,7 @@ import type { Value } from "./types";
  * Calculates the integer square root of a BigInt.
  */
 function isqrt(value: bigint): bigint {
-  if (value < 0n) {
+  if (value < 0) {
     throw new InterpreterError("Square root of negative not supported yet.");
   }
   if (value < 2n) return value;
@@ -28,7 +28,7 @@ function isqrt(value: bigint): bigint {
 }
 
 function isPerfectSquare(val: bigint): [boolean, bigint] {
-  if (val < 0n) return [false, 0n];
+  if (val < 0) return [false, 0n];
   const root = isqrt(val);
   return [root * root === val, root];
 }
@@ -40,7 +40,7 @@ export function sqrt(
 ): Value {
   if (v.n === "OVERFLOW") return v;
 
-  if (v.n < 0n) {
+  if (v.n < 0) {
     throw new InterpreterError("Square root of negative not supported yet.");
   }
 

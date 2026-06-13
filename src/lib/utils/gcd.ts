@@ -7,8 +7,8 @@ export function gcd(a: bigint, b: bigint): bigint {
   if (a === 0n) return b;
   if (b === 0n) return a;
 
-  a = a < 0n ? -a : a;
-  b = b < 0n ? -b : b;
+  a = a < 0 ? -a : a;
+  b = b < 0 ? -b : b;
 
   let shift = 0n;
   while (((a | b) & 1n) === 0n) {

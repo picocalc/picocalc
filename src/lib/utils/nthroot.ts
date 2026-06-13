@@ -7,12 +7,12 @@ import type { NormalValue } from "./types";
  * Calculates the integer nth root of a BigInt.
  */
 function iNthRoot(value: bigint, n: bigint): bigint {
-  if (value < 0n && n % 2n === 0n) {
+  if (value < 0 && n % 2n === 0n) {
     throw new InterpreterError(
       `Even (${n}-th) root of negative not supported.`,
     );
   }
-  if (value < 0n) return -iNthRoot(-value, n); // Handle odd roots of negatives
+  if (value < 0) return -iNthRoot(-value, n); // Handle odd roots of negatives
   if (value < 2n) return value;
   if (n === 1n) return value;
 
@@ -46,7 +46,7 @@ export function nthRoot(
   if (n === 1n) return v;
 
   // Handle negatives: Error if root is even, recurse if root is odd
-  if (v.n < 0n) {
+  if (v.n < 0) {
     if (n % 2n === 0n) {
       throw new InterpreterError(
         `Even (${n}-th) root of negative not supported.`,

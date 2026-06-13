@@ -12,7 +12,7 @@ function simplify(v: NormalValue): NormalValue {
   if (v.n === 0n) return ZERO;
   if (v.d === 1n) return v;
   const common = gcd(v.n, v.d);
-  const sign = v.d < 0n ? -1n : 1n;
+  const sign = v.d < 0 ? -1n : 1n;
   return { n: (v.n / common) * sign, d: (v.d / common) * sign, c: v.c, e: v.e };
 }
 
@@ -26,11 +26,11 @@ function toSimpleFraction(val: NormalValue): NormalValue {
 
   const c = getConst(val.c);
   const e = val.e ?? 1n;
-  const absE = e < 0n ? -e : e;
+  const absE = e < 0 ? -e : e;
 
   const poweredConstant: NormalValue = {
-    n: e < 0n ? c.d ** absE : c.n ** absE,
-    d: e < 0n ? c.n ** absE : c.d ** absE,
+    n: e < 0 ? c.d ** absE : c.n ** absE,
+    d: e < 0 ? c.n ** absE : c.d ** absE,
   };
 
   return multiply(poweredConstant, { n: val.n, d: val.d });
