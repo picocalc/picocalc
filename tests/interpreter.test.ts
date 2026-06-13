@@ -429,6 +429,10 @@ describe("evaluate", () => {
     expect(calculate("abs(pi^2)", { format: "precise" })).toBe("pi^2");
   });
 
+  it("should handle exponentiation of a constant to a fraction in precise mode", () => {
+    expect(calculate("pi^(1/3)", { format: "precise" })).toBe("pi^(1/3)");
+  });
+
   it("should handle multiplying constants in decimal mode", () => {
     expect(calculate("pi * pi", { maxDecimals: 4 })).toBe("9.8696");
     expect(calculate("2 * pi * pi", { maxDecimals: 4 })).toBe("19.7392");

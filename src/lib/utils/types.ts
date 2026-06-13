@@ -26,5 +26,11 @@ type NormalValue = SimpleFraction & {
 
 type Value = NormalValue | OverflowValue;
 
-export type { NormalValue, Value, ValueConstant, SimpleFraction };
+export type {
+  NormalValue,
+  Value,
+  ValueConstant,
+  SimpleFraction,
+  ValueExponent,
+};
 export { OverflowValue };

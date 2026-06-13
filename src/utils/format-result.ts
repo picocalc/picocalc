@@ -1,11 +1,23 @@
 import type { PrecisionOptions } from "#lib/interpreter";
-import type { NormalValue, ValueConstant } from "#lib/utils/types";
+import type {
+  NormalValue,
+  ValueConstant,
+  ValueExponent,
+} from "#lib/utils/types";
 
-function getConstantStr(coeff: bigint, c?: ValueConstant, e?: bigint) {
+function getConstantStr(coeff: bigint, c?: ValueConstant, e?: ValueExponent) {
   if (coeff === 0n) return "0";
-  if (!c) return coeff.toString();
-  const absExp = e && e < 0 ? -e : e;
-  const constantStr = absExp && absExp !== 1n ? `${c}^${absExp}` : c;
+  if (!c) return `${coeff}`;
+  const isOne = e && e.n === 1n && (e.d === undefined || e.d === 1n);
+  if (!e || isOne) {
+    if (coeff === 1n) return c;
+    if (coeff === -1n) return `-${c}`;
+    return `${coeff}${c}`;
+  }
+  const num = e.n;
+  const den = e.d ?? 1n;
+  const expStr = den === 1n ? `${num}` : `(${num}/${den})`;
+  const constantStr = `${c}^${expStr}`;
   if (coeff === 1n) return constantStr;
   if (coeff === -1n) return `-${constantStr}`;
   return `${coeff}${constantStr}`;
@@ -17,10 +29,12 @@ function formatPrecise(v: NormalValue): string {
   const isNegative = n < 0;
   const absN = isNegative ? -n : n;
   const numSign = isNegative ? "-" : "";
-  if (c && e && e.n < 0) {
-    return `${numSign}${absN.toString()}/${getConstantStr(d, c, e.n)}`;
+  if (c && e && e.n < 0n) {
+    const positiveExp = { n: -e.n, d: e.d };
+    const denominatorStr = getConstantStr(d, c, positiveExp);
+    return `${numSign}${absN}/${denominatorStr}`;
   }
-  const numeratorStr = getConstantStr(absN, c, e?.n);
+  const numeratorStr = getConstantStr(absN, c, e);
   if (d === 1n) return `${numSign}${numeratorStr}`;
   return `${numSign}${numeratorStr}/${d}`;
 }
