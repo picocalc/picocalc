@@ -248,6 +248,7 @@ describe("evaluate", () => {
     expect(calculate("(1/3)^pi", decimals(12))).toBe("0.031701467835");
     expect(calculate("e^pi", decimals(12))).toBe("23.140692632779");
     expect(calculate("pi^(1/3)", decimals(15))).toBe("1.464591887561523");
+    expect(calculate("sqrt(pi)", decimals(10))).toBe("1.7724538509");
   });
 
   it("should handle a simple remainder division", () => {
@@ -435,6 +436,7 @@ describe("evaluate", () => {
     expect(calculate("pi^(3/5)", { format: "precise" })).toBe("pi^(3/5)");
     expect(calculate("pi^(5/3)", { format: "precise" })).toBe("pi^(5/3)");
     expect(calculate("pi^(3/4)", { format: "precise" })).toBe("pi^(3/4)");
+    expect(calculate("sqrt(pi)", { format: "precise" })).toBe("sqrt(pi)");
   });
 
   it("should handle multiplying constants in decimal mode", () => {
