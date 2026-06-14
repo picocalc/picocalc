@@ -1,6 +1,8 @@
 import { DivisionByZeroError } from "../errors";
+import { add } from "./add";
 import { ZERO } from "./constants";
 import { gcd } from "./gcd";
+import { simplify } from "./simplify";
 import { OverflowValue } from "./types";
 import type { Value, ValueConstant } from "./types";
 
@@ -42,12 +44,10 @@ export function divide(left: Value, right: Value): Value {
 
   if (lE !== undefined && rE !== undefined) {
     if (left.c === right.c) {
-      nExp = lE - rE;
-      // If exponents cancel out completely, drop the constant
-      if (nExp === 0n) {
-        c = undefined;
-        nExp = undefined;
-      }
+      const lExpD = left.e?.d ?? 1n;
+      const rExpD = right.e?.d ?? 1n;
+      const e = simplify(add({ n: lE, d: lExpD }, { n: rE, d: rExpD }, true));
+      return { n, d, c, e };
     }
   } else if (lE !== undefined) {
     nExp = lE;
