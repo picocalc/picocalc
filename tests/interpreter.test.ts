@@ -493,8 +493,13 @@ describe("evaluate", () => {
     expect(calculate("1/pi", { format: "precise" })).toBe("1/pi");
     expect(calculate("1/sqrt(pi)", { format: "precise" })).toBe("1/sqrt(pi)");
     expect(calculate("pi / sqrt(pi)", { format: "precise" })).toBe("sqrt(pi)");
-    expect(calculate("sqrt(pi) / pi", { format: "precise" })).toBe("1/sqrt(pi)");
+    expect(calculate("sqrt(pi) / pi", { format: "precise" })).toBe(
+      "1/sqrt(pi)",
+    );
     expect(calculate("sqrt(pi) / 1", { format: "precise" })).toBe("sqrt(pi)");
+    expect(calculate("sqrt(pi) / 2", { format: "precise" })).toBe("sqrt(pi)/2");
+    expect(calculate("pi / 1", { format: "precise" })).toBe("pi");
+    expect(calculate("pi / 2", { format: "precise" })).toBe("pi/2");
   });
 
   it("should handle exponentiation + addition of a constant in precise mode", () => {
