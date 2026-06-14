@@ -28,32 +28,34 @@ export function multiply<V extends Value>(a: V, b: V): V | NormalValue {
     d = (a.d / g2) * (b.d / g1);
   }
 
-  if (a.c === undefined && b.c !== undefined) {
-    c = b.c;
-  } else if (a.c !== undefined && b.c === undefined) {
-    c = a.c;
-  } else if (a.c === b.c) {
-    c = a.c;
-  } else {
-    return multiply(toSimpleFraction(a), toSimpleFraction(b));
+  if (a.c === undefined && b.c === undefined) {
+    return { n, d };
   }
 
   const aExpN = a.e?.n;
   const bExpN = b.e?.n;
 
-  if (aExpN !== undefined && bExpN !== undefined) {
+  if (a.c === b.c) {
+    const aExpD = a.e?.d ?? 1n;
+    const bExpD = b.e?.d ?? 1n;
     const e = simplify(
-      add({ n: aExpN, d: a.e?.d ?? 1n }, { n: bExpN, d: b.e?.d ?? 1n }),
+      add({ n: aExpN ?? 1n, d: aExpD }, { n: bExpN ?? 1n, d: bExpD }),
     );
-    return { n, d, c, e };
+    return { n, d, c: a.c, e };
+  }
+
+  if (a.c === undefined && b.c !== undefined) {
+    c = b.c;
+  } else if (a.c !== undefined && b.c === undefined) {
+    c = a.c;
+  } else {
+    return multiply(toSimpleFraction(a), toSimpleFraction(b));
   }
 
   if (aExpN !== undefined && bExpN === undefined) {
     expN = aExpN;
   } else if (bExpN !== undefined && aExpN === undefined) {
     expN = bExpN;
-  } else if (a.c === b.c) {
-    expN = (aExpN ?? 1n) + (bExpN ?? 1n);
   }
 
   const e = expN ? { n: expN } : undefined;
