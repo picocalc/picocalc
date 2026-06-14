@@ -463,6 +463,8 @@ describe("evaluate", () => {
     expect(calculate("pi^(2/3)", { format: "precise" })).toBe("pi^(2/3)");
     expect(calculate("pi^(3/5)", { format: "precise" })).toBe("pi^(3/5)");
     expect(calculate("pi^(5/3)", { format: "precise" })).toBe("pi^(5/3)");
+    expect(calculate("pi^(5/2)", { format: "precise" })).toBe("pi^(5/2)");
+    expect(calculate("pi^(3/2)", { format: "precise" })).toBe("pi^(3/2)");
     expect(calculate("pi^(3/4)", { format: "precise" })).toBe("pi^(3/4)");
     expect(calculate("sqrt(pi)", { format: "precise" })).toBe("sqrt(pi)");
     expect(calculate("sqrt(pi) * sqrt(pi)", { format: "precise" })).toBe("pi");
@@ -676,6 +678,20 @@ describe.skipIf(win32)("evaluate - large operations", () => {
     const getTest = (numbers: number) => {
       const expression = "1 * ".repeat(numbers) + "1";
       it(`should handle multiplying ${numbers} numbers`, () => {
+        expect(calculate(expression)).toBe("1");
+      }, 2000);
+    };
+    getTest(100);
+    getTest(1000);
+    getTest(10_000);
+    getTest(100_000);
+    getTest(1000_000);
+  });
+
+  describe("exponentiating a lot of numbers", () => {
+    const getTest = (numbers: number) => {
+      const expression = "1 ^ ".repeat(numbers) + "1";
+      it(`should handle exponentiating ${numbers} numbers`, () => {
         expect(calculate(expression)).toBe("1");
       }, 2000);
     };

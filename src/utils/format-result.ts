@@ -17,7 +17,7 @@ function getConstantStr(coeff: bigint, c?: ValueConstant, e?: ValueExponent) {
   const num = e.n;
   const den = e.d ?? 1n;
   const expStr = den === 1n ? `${num}` : `(${num}/${den})`;
-  const constantStr = den === 2n ? `sqrt(${c})` : `${c}^${expStr}`;
+  const constantStr = den === 2n * num ? `sqrt(${c})` : `${c}^${expStr}`;
   if (coeff === 1n) return constantStr;
   if (coeff === -1n) return `-${constantStr}`;
   return `${coeff}${constantStr}`;
