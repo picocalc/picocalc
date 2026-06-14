@@ -163,22 +163,29 @@ describe("evaluate", () => {
     expect(calculate("0.1 * 0.2")).toBe("0.02");
   });
 
-  it("should correctly add 2 constants in precise mode", () => {
-    expect(calculate(calculate("e + pi", { format: "precise" }))).toBe(
-      calculate("e + pi"),
+  function expectToPreserveCorrectness(expression: string) {
+    expect(calculate(calculate(expression, { format: "precise" }))).toBe(
+      calculate(expression),
     );
+  }
+
+  it("should correctly add 2 constants in precise mode", () => {
+    expectToPreserveCorrectness("e + pi");
+    expectToPreserveCorrectness("e + 1");
+    expectToPreserveCorrectness("1 + pi");
+    expectToPreserveCorrectness("e^2 + pi");
+    expectToPreserveCorrectness("e + pi^2");
+    expectToPreserveCorrectness("e^2 + pi^2");
+    expectToPreserveCorrectness("e + e^2");
+    expectToPreserveCorrectness("pi^2 + pi");
   });
 
   it("should correctly multiply 2 constants in precise mode", () => {
-    expect(calculate(calculate("e * pi", { format: "precise" }))).toBe(
-      calculate("e * pi"),
-    );
+    expectToPreserveCorrectness("e * pi");
   });
 
   it("should correctly exponentiate 2 constants in precise mode", () => {
-    expect(calculate(calculate("e ^ pi", { format: "precise" }))).toBe(
-      calculate("e ^ pi"),
-    );
+    expectToPreserveCorrectness("e ^ pi");
   });
 
   it("should correctly multiply a whole number with a decimal", () => {

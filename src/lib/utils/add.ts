@@ -1,4 +1,6 @@
+import { ZERO } from "./constants";
 import { gcd } from "./gcd";
+import { toSimpleFraction } from "./simplify";
 import type { Value } from "./types";
 
 export function add(
@@ -40,11 +42,16 @@ export function add(
       d = lD * mLeft;
     }
   }
-  if (lC === rC && n !== 0n) {
+  if (n === 0n) return ZERO;
+  if (lC === rC) {
     c = lC;
     if (lE?.n === rE?.n) {
       e = lE;
+    } else {
+      return add(toSimpleFraction(left), toSimpleFraction(right), subtract);
     }
+  } else {
+    return add(toSimpleFraction(left), toSimpleFraction(right), subtract);
   }
   return { n, d, c, e };
 }
