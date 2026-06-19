@@ -15,7 +15,7 @@ function isqrt(value: bigint): bigint {
   if (value < 2n) return value;
 
   let res = 0n;
-  let bit = 1n << BigInt((value.toString(2).length - 1) & ~1);
+  let bit = 1n << (BigInt.bitLength(value) & ~1n);
 
   while (bit !== 0n) {
     if (value >= res + bit) {

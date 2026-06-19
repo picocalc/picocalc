@@ -57,6 +57,11 @@ function isUnaryOperation(op: StackOp) {
  */
 const MAX_PRECISION = 50_000;
 
+/**
+ * Maximum allowed factorial
+ */
+const MAX_FACTORIAL = 20_000;
+
 export interface PrecisionOptions {
   format?: "decimal" | "precise";
   maxDecimals?: number;
@@ -141,7 +146,7 @@ export function evaluate(
           pos,
         );
       }
-      if (reduced.n >= 4e5) {
+      if (reduced.n >= MAX_FACTORIAL) {
         values.push(OverflowValue);
         return;
       }

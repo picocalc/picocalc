@@ -6,6 +6,11 @@ import { sqrt } from "./sqrt";
 import { OverflowValue } from "./types";
 import type { Value } from "./types";
 
+/**
+ * Maximum digits allowed for the result of exponentiation
+ */
+const MAX_EXPONENT_RESULT_DIGITS = 10_000_000n;
+
 export function exponentiate(
   left: Value,
   right: Value,
@@ -60,7 +65,15 @@ export function exponentiate(
     [baseN, baseD] = [baseD, baseN];
   }
 
-  if (exponent > 1e4 && (baseN * exponent > 6e6 || baseD * exponent > 6e6)) {
+  const baseNDigits = BigInt.bitLength(baseN);
+  const baseDDigits = BigInt.bitLength(baseN);
+
+  if (
+    baseNDigits * exponent > MAX_EXPONENT_RESULT_DIGITS ||
+    baseDDigits * exponent > MAX_EXPONENT_RESULT_DIGITS ||
+    ((baseNDigits > 5000 || baseDDigits > 5000) && exponent > 10) ||
+    (exponent > 1e4 && (baseN * exponent > 6e6 || baseD * exponent > 6e6))
+  ) {
     return OverflowValue;
   }
 

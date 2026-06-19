@@ -1,3 +1,4 @@
+import "bigint.bitlength";
 import { evaluate } from "./lib/interpreter";
 import type { PrecisionOptions } from "./lib/interpreter";
 import { tokenize } from "./lib/lexer";

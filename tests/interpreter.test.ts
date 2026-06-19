@@ -100,6 +100,9 @@ describe("evaluate", () => {
   it("should throw DivisionByZeroError for division by 0", () => {
     expect(() => calculate("1/0")).toThrow(DivisionByZeroError);
     expect(() => calculate("0/0")).toThrow(DivisionByZeroError);
+    expect(() => calculate("0 * 1/0")).toThrow(DivisionByZeroError);
+    expect(() => calculate("1/0 * 0")).toThrow(DivisionByZeroError);
+    expect(() => calculate("(1/0)^-1")).toThrow(DivisionByZeroError);
   });
 
   it("should not throw DivisionByZeroError when not dividing by 0", () => {
@@ -611,21 +614,32 @@ describe("evaluate", () => {
     expect(calculate("|-e|", { format: "precise" })).toBe("e");
   });
 
-  it("should not throw OverflowError for exponentiating decimal", () => {
-    expect(() => calculate("e^2")).not.toThrow(OverflowError);
-  });
+  describe("OverflowError", () => {
+    it("should not throw for not large factorial", () => {
+      expect(() => calculate("10000!")).not.toThrow(RangeError);
+      expect(() => calculate("10000!")).not.toThrow(OverflowError);
+    }, 200);
 
-  it("should not throw OverflowError for calculatable results", () => {
-    const overflowing = "(10^1e10)";
+    describe("should not throw OverflowError for not large exponentiation", () => {
+      expect(() => calculate("(10^2e5)^10")).not.toThrow(OverflowError);
+    });
 
-    expect(() => calculate(`0 * ${overflowing}`)).not.toThrow(OverflowError);
-    expect(calculate(`0 * ${overflowing}`)).toBe("0");
+    it("should not throw OverflowError for exponentiating decimal", () => {
+      expect(() => calculate("e^2")).not.toThrow(OverflowError);
+    });
 
-    expect(() => calculate(`1 ^ ${overflowing}`)).not.toThrow(OverflowError);
-    expect(calculate(`1 ^ ${overflowing}`)).toBe("1");
+    it("should not throw OverflowError for calculatable results", () => {
+      const overflowing = "(10^1e10)";
 
-    expect(() => calculate(`${overflowing} ^ 0`)).not.toThrow(OverflowError);
-    expect(calculate(`${overflowing} ^ 0`)).toBe("1");
+      expect(() => calculate(`0 * ${overflowing}`)).not.toThrow(OverflowError);
+      expect(calculate(`0 * ${overflowing}`)).toBe("0");
+
+      expect(() => calculate(`1 ^ ${overflowing}`)).not.toThrow(OverflowError);
+      expect(calculate(`1 ^ ${overflowing}`)).toBe("1");
+
+      expect(() => calculate(`${overflowing} ^ 0`)).not.toThrow(OverflowError);
+      expect(calculate(`${overflowing} ^ 0`)).toBe("1");
+    });
   });
 });
 
@@ -645,31 +659,36 @@ describe("evaluate - error handling", () => {
     expect(() => calculate(`1e${bigNumber}`)).toThrow(MaximumPrecisionError);
   }, 200);
 
-  it("should throw OverflowError for very large factorial", () => {
-    expect(() => calculate("(1e9)!")).toThrow(OverflowError);
-    expect(() => calculate("(10^6)!")).toThrow(OverflowError);
-  }, 200);
+  describe("OverflowError", () => {
+    it("should throw OverflowError for large factorial", () => {
+      expect(() => calculate("(1e9)!")).toThrow(OverflowError);
+      expect(() => calculate("(10^6)!")).toThrow(OverflowError);
+      expect(() => calculate("1e5!")).toThrow(OverflowError);
+      expect(() => calculate("50000!")).toThrow(OverflowError);
+      expect(() => calculate("25000!")).toThrow(OverflowError);
+    }, 200);
 
-  it("should throw OverflowError for very large exponentiation", () => {
-    expect(() => calculate("10^10^10")).toThrow(OverflowError);
-  }, 200);
+    it("should throw OverflowError for very large exponentiation", () => {
+      expect(() => calculate("3e5!^5")).toThrow(OverflowError);
+      expect(() => calculate("(10^2000)^100")).toThrow(OverflowError);
+      expect(() => calculate("(10^2e5)^1000")).toThrow(OverflowError);
+      expect(() => calculate("1e10000000")).toThrow(OverflowError);
+      expect(() => calculate("10^10^10")).toThrow(OverflowError);
+    }, 200);
 
-  it("should throw OverflowError for very large exponentiation", () => {
-    expect(() => calculate("1e10000000")).toThrow(OverflowError);
-  }, 200);
-
-  it("should throw OverflowError when further handling overflowing numbers", () => {
-    expect(() => calculate("-10^10^10")).toThrow(OverflowError);
-    expect(() => calculate("abs(10^10^10)")).toThrow(OverflowError);
-    expect(() => calculate("ceil(10^10^10)")).toThrow(OverflowError);
-    expect(() => calculate("floor(10^10^10)")).toThrow(OverflowError);
-    expect(() => calculate("sqrt(10^10^10)")).toThrow(OverflowError);
-    expect(() => calculate("(10^10^10)!")).toThrow(OverflowError);
-    expect(() => calculate("(10^10^10) + 1")).toThrow(OverflowError);
-    expect(() => calculate("(10^10^10) ^ 10")).toThrow(OverflowError);
-    expect(() => calculate("10 ^ (10^10^10)")).toThrow(OverflowError);
-    expect(() => calculate("|(10^10^10)|")).toThrow(OverflowError);
-  }, 200);
+    it("should throw OverflowError when further handling overflowing numbers", () => {
+      expect(() => calculate("-10^10^10")).toThrow(OverflowError);
+      expect(() => calculate("abs(10^10^10)")).toThrow(OverflowError);
+      expect(() => calculate("ceil(10^10^10)")).toThrow(OverflowError);
+      expect(() => calculate("floor(10^10^10)")).toThrow(OverflowError);
+      expect(() => calculate("sqrt(10^10^10)")).toThrow(OverflowError);
+      expect(() => calculate("(10^10^10)!")).toThrow(OverflowError);
+      expect(() => calculate("(10^10^10) + 1")).toThrow(OverflowError);
+      expect(() => calculate("(10^10^10) ^ 10")).toThrow(OverflowError);
+      expect(() => calculate("10 ^ (10^10^10)")).toThrow(OverflowError);
+      expect(() => calculate("|(10^10^10)|")).toThrow(OverflowError);
+    }, 200);
+  });
 });
 
 describe.skipIf(win32)("evaluate - large operations", () => {
