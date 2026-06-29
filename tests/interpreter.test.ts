@@ -304,6 +304,11 @@ describe("evaluate", () => {
     expect(calculate("1.2e-3")).toBe("0.0012");
   });
 
+  it("should handle scientific notation in precise mode", () => {
+    expect(calculate("2e-2", { format: "precise" })).toBe("1/50");
+    expect(calculate("1.2e-3", { format: "precise" })).toBe("3/2500");
+  });
+
   it("should handle factorial", () => {
     expect(calculate("1!")).toBe("1");
     expect(calculate("5!")).toBe("120");

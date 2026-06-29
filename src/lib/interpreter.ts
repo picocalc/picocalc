@@ -245,7 +245,7 @@ export function evaluate(
         if (d === 1n) {
           values.push({ n, d: 1n });
         } else {
-          values.push(simplify({ n, d }));
+          values.push({ n, d });
         }
         break;
       }

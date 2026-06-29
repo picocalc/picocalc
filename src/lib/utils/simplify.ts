@@ -15,7 +15,9 @@ function simplify(v: NormalValue): NormalValue {
   if (v.d === 1n) return v;
   const common = gcd(v.n, v.d);
   const sign = v.d < 0 ? -1n : 1n;
-  return { n: (v.n / common) * sign, d: (v.d / common) * sign, c: v.c, e: v.e };
+  const n = (v.n / common) * sign;
+  const d = (v.d / common) * sign;
+  return { n, d, c: v.c, e: v.e };
 }
 
 /**

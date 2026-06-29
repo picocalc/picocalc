@@ -9,7 +9,7 @@ type Numerator = {
 };
 
 type Denominator = {
-  /** Numerator */
+  /** Denominator */
   readonly d: bigint;
 };
 
