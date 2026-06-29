@@ -5,8 +5,7 @@ import {
   ParserError,
   UnexpectedOperatorError,
 } from "#lib/parser";
-
-import { calculate } from "../src";
+import { calculate } from "#src";
 
 describe("parse", () => {
   it("should throw UnexpectedOperatorError for consecutive binary operators", () => {

@@ -8,8 +8,7 @@ import {
   OverflowError,
 } from "#lib/errors";
 import { E, PI } from "#lib/utils/constants";
-
-import { calculate } from "../src";
+import { calculate } from "#src";
 
 const win32 = process.platform === "win32";
 
@@ -615,6 +614,11 @@ describe("evaluate", () => {
     expect(calculate("|-e|", { format: "precise" })).toBe("e");
   });
 
+  it("should handle adding big fractions", () => {
+    const expr = `1/1e200000 + 1/1e200001 + 1/1e200002`;
+    expect(calculate(expr, { maxDecimals: 500 })).toBe("0");
+  }, 200);
+
   describe("OverflowError", () => {
     it("should not throw for not large factorial", () => {
       expect(() => calculate("10000!")).not.toThrow(RangeError);
@@ -780,4 +784,18 @@ describe.skipIf(win32)("evaluate - large operations", () => {
       MaximumPrecisionError,
     );
   }, 2000);
+
+  describe("adding many big fractions", () => {
+    const BASE = 200_000;
+    const FRACTIONS = 25;
+
+    let expr = `1/1e${BASE}`;
+    for (let i = 1; i < FRACTIONS; i++) {
+      expr += ` + 1/1e${BASE + i}`;
+    }
+
+    it(`should handle adding ${FRACTIONS} big fractions`, () => {
+      expect(calculate(expr, { maxDecimals: 500 })).toBe("0");
+    }, 2000);
+  });
 });

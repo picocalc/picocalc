@@ -1,4 +1,5 @@
-import { DivisionByZeroError } from "../errors";
+import { DivisionByZeroError } from "#lib/errors";
+
 import { gcd } from "./gcd";
 import type { NormalValue } from "./types";
 

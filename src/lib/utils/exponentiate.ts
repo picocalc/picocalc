@@ -1,4 +1,5 @@
-import { DivisionByZeroError } from "../errors";
+import { DivisionByZeroError } from "#lib/errors";
+
 import { ZERO, ONE, constants } from "./constants";
 import { nthRoot } from "./nthroot";
 import { simplify, toSimpleFraction } from "./simplify";

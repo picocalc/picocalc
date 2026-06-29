@@ -1,4 +1,5 @@
-import { DivisionByZeroError, NotImplementedError } from "../errors";
+import { DivisionByZeroError, NotImplementedError } from "#lib/errors";
+
 import { ZERO } from "./constants";
 import { simplify } from "./simplify";
 import type { NormalValue } from "./types";

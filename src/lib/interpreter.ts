@@ -62,6 +62,11 @@ const MAX_PRECISION = 50_000;
  */
 const MAX_FACTORIAL = 20_000;
 
+/**
+ * Maximum allowed exponent for scientific number notation
+ */
+const MAX_SCIENTIFIC_NUMBER_EXPONENT = 3e5;
+
 export interface PrecisionOptions {
   format?: "decimal" | "precise";
   maxDecimals?: number;
@@ -227,7 +232,7 @@ export function evaluate(
             );
           }
           const expValue = BigInt(token.exponent);
-          if (expValue > 2e6) {
+          if (expValue > MAX_SCIENTIFIC_NUMBER_EXPONENT) {
             values.push(OverflowValue);
             break;
           }

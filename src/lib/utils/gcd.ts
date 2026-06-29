@@ -1,5 +1,5 @@
 /**
- * Fast Binary GCD (Stein's Algorithm) for BigInt.
+ * The Euclidean GCD Algorithm for BigInt.
  */
 export function gcd(a: bigint, b: bigint): bigint {
   if (a === b) return a;
@@ -10,17 +10,9 @@ export function gcd(a: bigint, b: bigint): bigint {
   a = a < 0 ? -a : a;
   b = b < 0 ? -b : b;
 
-  let shift = 0n;
-  while (((a | b) & 1n) === 0n) {
-    a >>= 1n;
-    b >>= 1n;
-    shift++;
+  while (b > 0) {
+    a %= b;
+    [a, b] = [b, a];
   }
-  while ((a & 1n) === 0n) a >>= 1n;
-  do {
-    while ((b & 1n) === 0n) b >>= 1n;
-    if (a > b) [a, b] = [b, a];
-    b = b - a;
-  } while (b !== 0n);
-  return a << shift;
+  return a;
 }

@@ -1,4 +1,5 @@
-import { DivisionByZeroError } from "../errors";
+import { DivisionByZeroError } from "#lib/errors";
+
 import { add } from "./add";
 import { ZERO } from "./constants";
 import { gcd } from "./gcd";

@@ -1,4 +1,5 @@
-import { NotImplementedError } from "../errors";
+import { NotImplementedError } from "#lib/errors";
+
 import { ZERO } from "./constants";
 import { simplify } from "./simplify";
 import type { Value } from "./types";
