@@ -5,7 +5,7 @@
     "": {
       "name": "math-parser",
       "dependencies": {
-        "bigint.bitlength": "0.1.0",
+        "bigint.bitlength": "0.2.0",
       },
       "devDependencies": {
         "@gameroman/config": "0.2.2",
@@ -185,7 +185,7 @@
 
     "ast-kit": ["ast-kit@3.0.0", "", { "dependencies": { "@babel/parser": "^8.0.0", "estree-walker": "^3.0.3", "pathe": "^2.0.3" } }, "sha512-8OG92q3R35qjC/4i6BLBMg8IB+fClWu/1PEwg2Z9Rn+BuNaiEgJzpzn+pxWOdHJWDCAwu2JP0wCDTozAM4QirQ=="],
 
-    "bigint.bitlength": ["bigint.bitlength@0.1.0", "", {}, "sha512-7Z84sXlR/XC158k6ZXKvdorvG/juvo1pgsw9FaIENVEnqMrqHCEmMGWIG45wKPQsQXaHgXfiNLKA6twhOKW0Ew=="],
+    "bigint.bitlength": ["bigint.bitlength@0.2.0", "", {}, "sha512-ZwgOg11V4h5zDx1zExdTGIlV2iOvIO/7524WUSyKGjK86dOReAIZ4LWgKHXmjNrjqPchJjKRNMNSxojRQW6WPw=="],
 
     "birpc": ["birpc@4.0.0", "", {}, "sha512-LShSxJP0KTmd101b6DRyGBj57LZxSDYWKitQNW/mi8GRMvZb078Uf9+pveax1DrVL89vm7mWe+TovdI/UDOuPw=="],
 
