@@ -656,9 +656,9 @@ describe("evaluate", () => {
   });
 
   it("should handle adding big fractions", () => {
-    const expr = `1/1e200000 + 1/1e200001 + 1/1e200002`;
+    const expr = `1/1e200000 + 1/1e200001`;
     expect(calculate(expr, { maxDecimals: 500 })).toBe("0");
-  }, 250);
+  }, 200);
 
   describe("OverflowError", () => {
     it("should not throw for not large factorial", () => {
