@@ -357,6 +357,13 @@ describe("evaluate", () => {
     expect(calculate("3!2!")).toBe("12");
     expect(calculate("(3)!2")).toBe("12");
     expect(calculate("(3)!(2)")).toBe("12");
+    expect(calculate("(2)3!")).toBe("12");
+  });
+
+  it("should handle factorial with functions", () => {
+    expect(calculate("( sqrt(4) )!")).toBe("2");
+    expect(calculate("sqrt(4) !")).toBe("2");
+    expect(calculate("sqrt( 4! )", { maxDecimals: 12 })).toBe("4.898979485566");
   });
 
   it("should handle absolute values using pipe operator", () => {
