@@ -677,7 +677,7 @@ describe("evaluate", () => {
     expect(calculate("(-1) ^ (2/3)")).toBe("1");
     expect(calculate("(-1) ^ .4")).toBe("1");
     expect(calculate("(-1) ^ (1/3)")).toBe("-1");
-    expect(calculate("(-1) ^ .2")).toBe("1");
+    expect(calculate("(-1) ^ .2")).toBe("-1");
   });
 
   it("should handle exponentiation of -1 to a reasonable exponent", () => {

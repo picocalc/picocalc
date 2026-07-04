@@ -2,9 +2,9 @@ export class GenericMathErrror extends Error {
   pos?: number;
   constructor(name: string, message: string, pos?: number) {
     if (pos === undefined) {
-      super(`${name}: ${message}`);
+      super(message);
     } else {
-      super(`${name}: ${message} at position ${pos}`);
+      super(`${message} at position ${pos}`);
     }
     this.pos = pos;
     this.name = name;

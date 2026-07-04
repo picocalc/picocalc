@@ -30,7 +30,7 @@ export function exponentiate(
   if (rN === "OVERFLOW") return right;
 
   if (lN === -lD && c === undefined) {
-    if (rN % 2n) return { n: -1n, d: 1n };
+    if (simplify(right).n % 2n) return { n: -1n, d: 1n };
     return ONE;
   }
 
