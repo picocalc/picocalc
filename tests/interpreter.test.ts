@@ -604,6 +604,7 @@ describe("evaluate", () => {
     expect(calculate("6pi / 9", { format: "precise" })).toBe("2pi/3");
     expect(calculate("6e / 9", { format: "precise" })).toBe("2e/3");
     expect(calculate("pi / 2pi", { format: "precise" })).toBe("1/2");
+    expect(calculate("2pi / pi", { format: "precise" })).toBe("2");
   });
 
   it("should handle addition of constants", () => {

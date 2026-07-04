@@ -12,7 +12,10 @@ import { nthRoot } from "./nthroot";
 function simplify(v: NormalValue): NormalValue {
   if (v.d === 0n) throw new DivisionByZeroError();
   if (v.n === 0n) return ZERO;
-  if (v.d === 1n) return v;
+  if (v.d === 1n) {
+    if (v.e?.n === 0n) return { n: v.n, d: v.d };
+    return v;
+  }
   const common = gcd(v.n, v.d);
   const sign = v.d < 0 ? -1n : 1n;
   const n = (v.n / common) * sign;
