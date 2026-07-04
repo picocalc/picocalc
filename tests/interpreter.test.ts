@@ -660,6 +660,7 @@ describe("evaluate", () => {
     expect(calculate("e ^ 0", { format: "precise" })).toBe("1");
     expect(calculate("pi ^ 1", { format: "precise" })).toBe("pi");
     expect(calculate("e ^ 1", { format: "precise" })).toBe("e");
+    expect(calculate("pi * pi^-1", { format: "precise" })).toBe("1");
   });
 
   it("should handle a constant with pipe operator", () => {
