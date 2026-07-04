@@ -1,7 +1,7 @@
 import { DivisionByZeroError } from "#lib/errors";
+import type { NormalValue } from "#lib/types";
 
 import { gcd } from "./gcd";
-import type { NormalValue } from "./types";
 
 /**
  * Calculates remainder of division.

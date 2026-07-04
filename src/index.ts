@@ -1,8 +1,8 @@
 import "bigint.bitlength";
 import { evaluate } from "./lib/interpreter";
-import type { PrecisionOptions } from "./lib/interpreter";
 import { tokenize } from "./lib/lexer";
 import { parse } from "./lib/parser";
+import type { PrecisionOptions } from "./lib/types";
 import { formatResult } from "./utils/format-result";
 
 interface CalculateOptions extends PrecisionOptions {

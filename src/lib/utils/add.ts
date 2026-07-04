@@ -1,7 +1,8 @@
+import type { NormalValue, Value } from "#lib/types";
+
 import { ZERO } from "./constants";
 import { gcd } from "./gcd";
 import { toSimpleFraction } from "./simplify";
-import type { NormalValue, Value } from "./types";
 
 export function add<V extends Value>(
   left: V,

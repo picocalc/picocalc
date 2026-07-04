@@ -166,6 +166,32 @@ describe("evaluate", () => {
     expect(calculate("0.1 * 0.2")).toBe("0.02");
   });
 
+  it("should correctly handle rounding modes", () => {
+    expect(calculate("2/3", { maxDecimals: 3 })).toBe("0.667");
+    expect(calculate("2/3", { roundingMode: "round", maxDecimals: 3 })).toBe(
+      "0.667",
+    );
+    expect(calculate("2/3", { roundingMode: "truncate", maxDecimals: 3 })).toBe(
+      "0.666",
+    );
+
+    expect(
+      calculate("999/1000", { roundingMode: "round", maxDecimals: 2 }),
+    ).toBe("1");
+    expect(
+      calculate("999/1000", { roundingMode: "truncate", maxDecimals: 2 }),
+    ).toBe("0.99");
+
+    expect(calculate("-2/3", { roundingMode: "round", maxDecimals: 3 })).toBe(
+      "-0.667",
+    );
+    expect(
+      calculate("-2/3", { roundingMode: "truncate", maxDecimals: 3 }),
+    ).toBe("-0.666");
+
+    expect(calculate("sqrt(2) * sqrt(2)")).toBe("2");
+  });
+
   function expectToPreserveCorrectness(expression: string) {
     expect(calculate(calculate(expression, { format: "precise" }))).toBe(
       calculate(expression),
@@ -577,6 +603,8 @@ describe("evaluate", () => {
     expect(calculate("e / 2", { format: "precise" })).toBe("e/2");
     expect(calculate("6pi / 9", { format: "precise" })).toBe("2pi/3");
     expect(calculate("6e / 9", { format: "precise" })).toBe("2e/3");
+    expect(calculate("pi / 2pi", { format: "precise" })).toBe("1/2");
+    expect(calculate("2pi / pi", { format: "precise" })).toBe("2");
   });
 
   it("should handle addition of constants", () => {
@@ -625,6 +653,8 @@ describe("evaluate", () => {
     expect(calculate("0 * e", { format: "precise" })).toBe("0");
     expect(calculate("pi * 0", { format: "precise" })).toBe("0");
     expect(calculate("e * 0", { format: "precise" })).toBe("0");
+    expect(calculate("pi * pi^-1", { format: "precise" })).toBe("1");
+    expect(calculate("pi^-1 * pi", { format: "precise" })).toBe("1");
   });
 
   it("should handle exponentiation of constants", () => {

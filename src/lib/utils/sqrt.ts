@@ -1,8 +1,8 @@
 import { NotImplementedError } from "#lib/errors";
+import type { PrecisionOptions, Value } from "#lib/types";
 
 import { ZERO } from "./constants";
 import { simplify } from "./simplify";
-import type { Value } from "./types";
 
 /**
  * Calculates the integer square root of a BigInt.
@@ -36,11 +36,7 @@ function isPerfectSquare(val: bigint): [boolean, bigint] {
   return [root * root === val, root];
 }
 
-export function sqrt(
-  v: Value,
-  precise: boolean = false,
-  precisionDigits: number = 100,
-): Value {
+export function sqrt(v: Value, precision: PrecisionOptions): Value {
   if (v.n === "OVERFLOW") return v;
 
   if (v.n < 0) {
@@ -51,7 +47,7 @@ export function sqrt(
 
   if (v.n === 0n) return ZERO;
 
-  if (precise) {
+  if (precision.format === "precise") {
     const [nIsSquare, n] = isPerfectSquare(v.n);
     const [dIsSquare, d] = isPerfectSquare(v.d);
 
@@ -60,6 +56,8 @@ export function sqrt(
       return simplify({ n, d, c: v.c, e });
     }
   }
+
+  const precisionDigits = Math.max(10, (precision.maxDecimals ?? 30) * 3);
 
   // To get 'p' digits of precision in a fraction, we multiply the
   // numerator by 10^(2*p) before taking the integer sqrt.

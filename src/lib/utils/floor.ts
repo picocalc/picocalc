@@ -1,5 +1,6 @@
+import type { NormalValue } from "#lib/types";
+
 import { simplify } from "./simplify";
-import type { NormalValue } from "./types";
 
 /**
  * Returns the largest integer less than or equal to the value.

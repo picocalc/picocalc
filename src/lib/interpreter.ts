@@ -6,6 +6,9 @@ import {
   NotImplementedError,
 } from "./errors";
 import type { ParsedToken } from "./parser";
+import type { PrecisionOptions } from "./types";
+import { OverflowValue } from "./types";
+import type { NormalValue, Value } from "./types";
 import { add } from "./utils/add";
 import { ceil } from "./utils/ceil";
 import { getConst } from "./utils/constants";
@@ -17,8 +20,6 @@ import { mod } from "./utils/mod";
 import { multiply } from "./utils/multiply";
 import { simplify, toSimpleFraction } from "./utils/simplify";
 import { sqrt } from "./utils/sqrt";
-import { OverflowValue } from "./utils/types";
-import type { NormalValue, Value } from "./utils/types";
 
 const precedence = {
   LPAREN: 0,
@@ -67,20 +68,11 @@ const MAX_FACTORIAL = 20_000;
  */
 const MAX_SCIENTIFIC_NUMBER_EXPONENT = 3e5;
 
-export interface PrecisionOptions {
-  format?: "decimal" | "precise";
-  maxDecimals?: number;
-}
-
 export function evaluate(
   tokens: ParsedToken[],
   options: PrecisionOptions = {},
 ): NormalValue {
-  if (tokens.length === 0) {
-    throw new EmptyExpressionError();
-  }
-
-  const { format } = options;
+  if (tokens.length === 0) throw new EmptyExpressionError();
 
   const values: Value[] = [];
   const ops: StackOp[] = [];
@@ -133,7 +125,7 @@ export function evaluate(
           return;
         }
         case "SQRT_FN": {
-          values.push(sqrt(right, format === "precise"));
+          values.push(sqrt(right, options));
           return;
         }
       }
@@ -188,7 +180,7 @@ export function evaluate(
         return;
       }
       case "EXP": {
-        values.push(exponentiate(left, right, format === "precise"));
+        values.push(exponentiate(left, right, options));
         return;
       }
     }
@@ -250,7 +242,7 @@ export function evaluate(
         break;
       }
       case "CONST": {
-        if (format === "precise") {
+        if (options.format === "precise") {
           values.push({ n: 1n, d: 1n, c: token.id });
         } else {
           values.push(getConst(token.id));

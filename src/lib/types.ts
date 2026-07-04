@@ -26,11 +26,18 @@ type NormalValue = SimpleFraction & {
 
 type Value = NormalValue | OverflowValue;
 
+interface PrecisionOptions {
+  readonly format?: "decimal" | "precise";
+  readonly maxDecimals?: number;
+  readonly roundingMode?: "round" | "truncate";
+}
+
 export type {
   NormalValue,
   Value,
   ValueConstant,
   SimpleFraction,
   ValueExponent,
+  PrecisionOptions,
 };
 export { OverflowValue };

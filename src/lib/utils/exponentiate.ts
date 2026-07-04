@@ -1,11 +1,11 @@
 import { DivisionByZeroError } from "#lib/errors";
+import type { PrecisionOptions, Value } from "#lib/types";
+import { OverflowValue } from "#lib/types";
 
 import { ZERO, ONE, constants } from "./constants";
 import { nthRoot } from "./nthroot";
 import { simplify, toSimpleFraction } from "./simplify";
 import { sqrt } from "./sqrt";
-import { OverflowValue } from "./types";
-import type { Value } from "./types";
 
 /**
  * Maximum digits allowed for the result of exponentiation
@@ -15,7 +15,7 @@ const MAX_EXPONENT_RESULT_DIGITS = 10_000_000n;
 export function exponentiate(
   left: Value,
   right: Value,
-  precise: boolean,
+  precision: PrecisionOptions,
 ): Value {
   const rN = right.n;
   if (rN === 0n) return ONE;
@@ -88,6 +88,6 @@ export function exponentiate(
   const v = { n, d, c, e };
 
   if (dExp === 1n) return v;
-  if (dExp === 2n) return sqrt(v, precise);
-  return nthRoot(v, dExp, precise);
+  if (dExp === 2n) return sqrt(v, precision);
+  return nthRoot(v, dExp, precision);
 }

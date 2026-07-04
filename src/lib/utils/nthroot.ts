@@ -1,8 +1,8 @@
 import { DivisionByZeroError, NotImplementedError } from "#lib/errors";
+import type { NormalValue, PrecisionOptions } from "#lib/types";
 
 import { ZERO } from "./constants";
 import { simplify } from "./simplify";
-import type { NormalValue } from "./types";
 
 /**
  * Calculates the integer nth root of a BigInt.
@@ -40,8 +40,7 @@ function iNthRoot(value: bigint, n: bigint): bigint {
 export function nthRoot(
   v: NormalValue,
   n: bigint,
-  precise: boolean = false,
-  precisionDigits: number = 100,
+  precision: PrecisionOptions,
 ): NormalValue {
   if (n === 0n) throw new DivisionByZeroError();
   if (n === 1n) return v;
@@ -54,19 +53,14 @@ export function nthRoot(
       );
     }
     // For odd roots: nthRoot(-x) = -nthRoot(x)
-    const positiveResult = nthRoot(
-      { n: -v.n, d: v.d },
-      n,
-      precise,
-      precisionDigits,
-    );
+    const positiveResult = nthRoot({ n: -v.n, d: v.d }, n, precision);
     return { n: -positiveResult.n, d: positiveResult.d };
   }
 
   if (v.n === 0n) return ZERO;
 
   // 1. Try for an exact integer root if 'precise' is requested
-  if (precise) {
+  if (precision.format === "precise") {
     const rootN = iNthRoot(v.n, n);
     const rootD = iNthRoot(v.d, n);
     if (rootN ** n === v.n && rootD ** n === v.d) {
@@ -74,6 +68,8 @@ export function nthRoot(
       return simplify({ n: rootN, d: rootD, c: v.c, e });
     }
   }
+
+  const precisionDigits = Math.max(10, (precision.maxDecimals ?? 30) * 3);
 
   // 2. Fallback to high-precision approximation
   // To get 'p' digits of precision, we multiply the numerator by 10^(root * p)

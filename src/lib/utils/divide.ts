@@ -1,11 +1,11 @@
 import { DivisionByZeroError } from "#lib/errors";
+import { OverflowValue } from "#lib/types";
+import type { Value, ValueExponent } from "#lib/types";
 
 import { add } from "./add";
 import { ZERO } from "./constants";
 import { gcd } from "./gcd";
 import { simplify } from "./simplify";
-import { OverflowValue } from "./types";
-import type { Value, ValueExponent } from "./types";
 
 export function divide(left: Value, right: Value): Value {
   const lN = left.n;

@@ -52,7 +52,7 @@ function isAlpha(ch?: string): boolean {
 }
 
 interface LexerOptions {
-  decimalSeparator?: "." | ",";
+  readonly decimalSeparator?: "." | ",";
 }
 
 /**

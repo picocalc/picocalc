@@ -1,8 +1,9 @@
+import type { NormalValue, Value } from "#lib/types";
+
 import { add } from "./add";
 import { ZERO } from "./constants";
 import { gcd } from "./gcd";
 import { simplify, toSimpleFraction } from "./simplify";
-import type { NormalValue, Value } from "./types";
 
 export function multiply<V extends Value>(a: V, b: V): V | NormalValue {
   const aN = a.n;

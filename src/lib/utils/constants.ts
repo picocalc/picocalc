@@ -1,4 +1,4 @@
-import type { NormalValue, ValueConstant } from "./types";
+import type { NormalValue, ValueConstant } from "#lib/types";
 
 const PI: string = Math.PI.toString();
 const E: string = Math.E.toString();

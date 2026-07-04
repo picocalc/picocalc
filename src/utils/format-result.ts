@@ -1,9 +1,9 @@
-import type { PrecisionOptions } from "#lib/interpreter";
 import type {
   NormalValue,
   ValueConstant,
   ValueExponent,
-} from "#lib/utils/types";
+  PrecisionOptions,
+} from "#lib/types";
 
 function getConstantStr(coeff: bigint, c?: ValueConstant, e?: ValueExponent) {
   if (coeff === 0n) return "0";
@@ -51,12 +51,12 @@ function formatResult(v: NormalValue, options: PrecisionOptions = {}): string {
     return formatPrecise(v);
   }
 
-  const { maxDecimals = 30 } = options;
+  const { maxDecimals = 30, roundingMode = "round" } = options;
 
   const isNegative = n < 0;
   const absN = isNegative ? -n : n;
 
-  const integerPart = (absN / d).toString();
+  let integerPart = (absN / d).toString();
   let remainder = absN % d;
 
   if (remainder === 0n) {
@@ -67,11 +67,35 @@ function formatResult(v: NormalValue, options: PrecisionOptions = {}): string {
   let fractionalPart = "";
   let count = 0;
 
-  while (remainder !== 0n && count < maxDecimals) {
+  const targetLength = maxDecimals + 1;
+
+  while (remainder !== 0n && count < targetLength) {
     remainder *= 10n;
     fractionalPart += (remainder / d).toString();
     remainder %= d;
     count++;
+  }
+
+  const nexDigitStr = fractionalPart[maxDecimals];
+  if (nexDigitStr) {
+    const nextDigit = parseInt(nexDigitStr, 10);
+    // Slice off the lookahead digit so we are at maxDecimals length
+    fractionalPart = fractionalPart.slice(0, maxDecimals);
+
+    if (roundingMode === "round" && nextDigit >= 5) {
+      // We need to increment the fractional part like a number string
+      // BigInt helps us cleanly avoid overflow issues if fractionalPart is all 9s
+      const incremented = (BigInt(fractionalPart) + 1n).toString();
+
+      if (incremented.length > fractionalPart.length) {
+        // If it overflowed (e.g., 999 + 1 = 1000), the carry goes into the integer part
+        integerPart = (BigInt(integerPart) + 1n).toString();
+        fractionalPart = incremented.slice(1);
+      } else {
+        // Pads leading zeros if necessary (e.g., "049" + 1 -> "050")
+        fractionalPart = incremented.padStart(fractionalPart.length, "0");
+      }
+    }
   }
 
   let lastNonZero = -1;
