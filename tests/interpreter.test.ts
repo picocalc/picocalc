@@ -766,6 +766,7 @@ describe("evaluate - error handling", () => {
       expect(() => calculate("(10^10^10) ^ 10")).toThrow(OverflowError);
       expect(() => calculate("10 ^ (10^10^10)")).toThrow(OverflowError);
       expect(() => calculate("|(10^10^10)|")).toThrow(OverflowError);
+      expect(() => calculate("10^10^10^10 % 9^9^9^9")).toThrow(OverflowError);
     }, 200);
   });
 });

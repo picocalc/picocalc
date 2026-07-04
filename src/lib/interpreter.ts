@@ -153,9 +153,6 @@ export function evaluate(
 
     const left = values.pop()!;
 
-    const lN = left.n;
-    const rN = right.n;
-
     switch (op) {
       case "ADD":
       case "SUBTRACT": {
@@ -172,7 +169,7 @@ export function evaluate(
         return;
       }
       case "MOD": {
-        if (lN === "OVERFLOW" || rN === "OVERFLOW") {
+        if (left.n === "OVERFLOW" || right.n === "OVERFLOW") {
           values.push(OverflowValue);
           return;
         }
