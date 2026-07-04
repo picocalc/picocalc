@@ -42,15 +42,14 @@ const precedence = {
 
 type StackOp = keyof typeof precedence;
 
-function isUnaryOperation(op: StackOp) {
+function isFunctionOp(op: StackOp) {
   return (
-    op === "UNARY_PLUS" ||
-    op === "UNARY_MINUS" ||
-    op === "ABS_FN" ||
-    op === "CEIL_FN" ||
-    op === "FLOOR_FN" ||
-    op === "SQRT_FN"
+    op === "ABS_FN" || op === "CEIL_FN" || op === "FLOOR_FN" || op === "SQRT_FN"
   );
+}
+
+function isUnaryOperation(op: StackOp) {
+  return op === "UNARY_PLUS" || op === "UNARY_MINUS" || isFunctionOp(op);
 }
 
 /**
@@ -261,6 +260,9 @@ export function evaluate(
         }
         if (!foundMatch) throw new MismatchedParenthesisError(token.pos);
         ops.pop();
+        const nextOp = ops[ops.length - 1];
+        if (!nextOp) break;
+        if (isFunctionOp(nextOp)) applyOp(token.pos);
         break;
       }
       case "ABS_OPEN": {
@@ -360,9 +362,7 @@ export function evaluate(
 
   const finalValue = values.pop()!;
 
-  if (finalValue.n === "OVERFLOW") {
-    throw new OverflowError();
-  }
+  if (finalValue.n === "OVERFLOW") throw new OverflowError();
 
   return simplify(finalValue);
 }
