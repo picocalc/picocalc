@@ -192,8 +192,8 @@ export function evaluate(
       ops.length > 0 &&
       !isUnary &&
       (isRightAssociative
-        ? precedence[ops[ops.length - 1]!] > precedence[currentOp]
-        : precedence[ops[ops.length - 1]!] >= precedence[currentOp])
+        ? precedence[ops.at(-1)!] > precedence[currentOp]
+        : precedence[ops.at(-1)!] >= precedence[currentOp])
     ) {
       applyOp(pos);
     }
@@ -245,14 +245,15 @@ export function evaluate(
         }
         break;
       }
-      case "LPAREN": {
-        ops.push("LPAREN");
+      case "LPAREN":
+      case "ABS_OPEN": {
+        ops.push(token.type);
         break;
       }
       case "RPAREN": {
         let foundMatch = false;
         while (ops.length > 0) {
-          if (ops[ops.length - 1] === "LPAREN") {
+          if (ops.at(-1) === "LPAREN") {
             foundMatch = true;
             break;
           }
@@ -260,18 +261,14 @@ export function evaluate(
         }
         if (!foundMatch) throw new MismatchedParenthesisError(token.pos);
         ops.pop();
-        const nextOp = ops[ops.length - 1];
+        const nextOp = ops.at(-1);
         if (!nextOp) break;
         if (isFunctionOp(nextOp)) applyOp(token.pos);
         break;
       }
-      case "ABS_OPEN": {
-        ops.push("ABS_OPEN");
-        break;
-      }
       case "ABS_CLOSE": {
         while (ops.length > 0) {
-          if (ops[ops.length - 1] === "ABS_OPEN") {
+          if (ops.at(-1) === "ABS_OPEN") {
             break;
           }
           applyOp(token.pos);
@@ -306,24 +303,12 @@ export function evaluate(
         pushOpWithPrecedence("EXP", token.pos);
         break;
       }
-      case "UNARY_PLUS": {
-        pushOpWithPrecedence("UNARY_PLUS", token.pos);
-        break;
-      }
-      case "UNARY_MINUS": {
-        pushOpWithPrecedence("UNARY_MINUS", token.pos);
-        break;
-      }
-      case "IMPLICIT_MUL": {
-        pushOpWithPrecedence("IMPLICIT_MUL", token.pos);
-        break;
-      }
-      case "FACTORIAL": {
-        pushOpWithPrecedence("FACTORIAL", token.pos);
-        break;
-      }
+      case "UNARY_PLUS":
+      case "UNARY_MINUS":
+      case "IMPLICIT_MUL":
+      case "FACTORIAL":
       case "MOD": {
-        pushOpWithPrecedence("MOD", token.pos);
+        pushOpWithPrecedence(token.type, token.pos);
         break;
       }
       case "FUNC": {
@@ -351,8 +336,8 @@ export function evaluate(
   }
 
   while (ops.length > 0) {
-    const top = ops[ops.length - 1];
-    const lastPos = tokens[tokens.length - 1]?.pos ?? 0;
+    const top = ops.at(-1);
+    const lastPos = tokens.at(-1)?.pos ?? 0;
     if (top === "LPAREN") {
       ops.pop();
       continue;
