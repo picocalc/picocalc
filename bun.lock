@@ -8,7 +8,7 @@
         "bigint.bitlength": "0.2.0",
       },
       "devDependencies": {
-        "@gameroman/config": "0.2.4",
+        "@gameroman/config": "0.2.5",
         "@types/bun": "1.3.14",
         "oxfmt": "0.58.0",
         "oxlint": "1.73.0",
@@ -25,7 +25,7 @@
 
     "@emnapi/wasi-threads": ["@emnapi/wasi-threads@1.2.2", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-c95qOXkHdydNKhscBTebqEC1CVAZpyqOfVfBzQ1qgzyl3gfeldUjIggDbIZgDKsHLgnsM+igH7TJ/eAasaVuMA=="],
 
-    "@gameroman/config": ["@gameroman/config@0.2.4", "", { "peerDependencies": { "@biomejs/biome": "^2.5.1", "oxfmt": ">=0.58.0", "oxlint": "^1.73.0", "oxlint-tsgolint": ">=0.24.0", "typescript": "^6.0.3" }, "optionalPeers": ["@biomejs/biome", "oxfmt", "oxlint", "oxlint-tsgolint", "typescript"] }, "sha512-rN2i3Ydei7dD7azlcW/VnCNyDCBinmeieoXjPold5XrnPjTZDUIk2AmWoLB3RQsaYm3sISKxochMrTpntfe0Ag=="],
+    "@gameroman/config": ["@gameroman/config@0.2.5", "", { "peerDependencies": { "@biomejs/biome": "^2.5.3", "oxfmt": ">=0.58.0", "oxlint": "^1.73.0", "oxlint-tsgolint": ">=0.24.0", "typescript": "^6.0.3 || ^7.0.2" }, "optionalPeers": ["@biomejs/biome", "oxfmt", "oxlint", "oxlint-tsgolint", "typescript"] }, "sha512-6JkVgj6nt7rFXOAAoaw0USTkzV4u3/6Sbggzwt6tuiZJCVGJM4XvWs86lw0ZUplqt35ek2Ek6NiluX4OCC6mww=="],
 
     "@napi-rs/wasm-runtime": ["@napi-rs/wasm-runtime@1.1.6", "", { "dependencies": { "@tybys/wasm-util": "^0.10.3" }, "peerDependencies": { "@emnapi/core": "^1.7.1", "@emnapi/runtime": "^1.7.1" } }, "sha512-ZLv/JdUfkvOy9eCnnBaGfiO+XimbjebAeO+MRQqD/B+FR1tnRN0tpKSJHRbE8sFfS6aqsXZ67TQjfwfsxULVbg=="],
 

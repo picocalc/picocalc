@@ -1,6 +1,6 @@
-import { GenericMathErrror } from "./errors";
+import { PicocalcErrror } from "./errors";
 
-export class LexerError extends GenericMathErrror {
+export class LexerError extends PicocalcErrror {
   constructor(message: string, pos: number) {
     super("LexerError", message, pos);
   }

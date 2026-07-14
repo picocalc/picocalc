@@ -1,7 +1,3 @@
-import { defineConfig } from "@gameroman/config/oxlint/ts";
+import { config } from "@gameroman/config/oxlint/ts";
 
-export default defineConfig({
-  rules: {
-    "typescript/prefer-optional-chain": "error",
-  },
-});
+export default config;
