@@ -408,6 +408,7 @@ describe("evaluate", () => {
   });
 
   it("should handle arctan function", () => {
+    expect(calculate("arctan(0)")).toBe("0");
     expect(calculate("arctan(1/5)", { maxDecimals: 50 })).toBe(
       "0.19739555984988075837004976519479029344758510378785",
     );
@@ -419,6 +420,9 @@ describe("evaluate", () => {
     );
     expect(calculate("arctan(2)", { maxDecimals: 64 })).toBe(
       "1.1071487177940905030170654601785370400700476454014326466765392074",
+    );
+    expect(calculate("arctan(-2)", { maxDecimals: 64 })).toBe(
+      "-1.1071487177940905030170654601785370400700476454014326466765392074",
     );
   }, 200);
 
@@ -447,6 +451,13 @@ describe("evaluate", () => {
     expect(calculate("ceil(sqrt(pi))", { format: "precise" })).toBe("2");
     expect(calculate("ceil(sqrt(e))", { format: "precise" })).toBe("2");
   });
+
+  it("should handle arctan function in precise mode", () => {
+    expect(calculate("arctan(1)", { format: "precise" })).toBe("pi/4");
+    expect(calculate("4arctan(1)", { format: "precise" })).toBe("pi");
+    expect(calculate("-2arctan(1)", { format: "precise" })).toBe("-pi/2");
+    expect(calculate("2arctan(-1)", { format: "precise" })).toBe("-pi/2");
+  }, 200);
 
   it("should handle sqrt function", () => {
     expect(calculate("sqrt(0)")).toBe("0");
