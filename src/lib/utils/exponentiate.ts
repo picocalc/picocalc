@@ -23,26 +23,26 @@ export function exponentiate(
   const lN = left.n;
   if (lN === "OVERFLOW") return left;
 
-  const lD = left.d;
-  const c = left.c;
+  const { c, d: lD } = left;
 
   if (lN === lD && c === undefined) return ONE;
   if (rN === "OVERFLOW") return right;
 
-  if (lN === -lD && c === undefined) {
-    if (simplify(right).n % 2n) return { n: -1n, d: 1n };
+  const rS = simplify(right);
+
+  if (lN === -lD && c === undefined && rS.d % 2n) {
+    if (rS.n % 2n) return { n: -1n, d: 1n };
     return ONE;
   }
 
-  const normalizedExp = toSimpleFraction(simplify(right));
+  const normalizedExp = toSimpleFraction(rS);
+  const dExp = normalizedExp.d;
   let exponent = normalizedExp.n;
 
   if (lN === 0n) {
     if (exponent < 0) throw new DivisionByZeroError();
     return ZERO;
   }
-
-  const dExp = normalizedExp.d;
 
   if (dExp >= 100) {
     let baseFloat = Number(lN) / Number(lD);
