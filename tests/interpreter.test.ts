@@ -15,7 +15,9 @@ const win32 = process.platform === "win32";
 function safe<T>(fn: () => T) {
   try {
     return fn();
-  } catch {}
+  } catch (e) {
+    return e;
+  }
 }
 
 describe("evaluate", () => {
@@ -303,6 +305,7 @@ describe("evaluate", () => {
 
     expect(safe(() => calculate("(-1)^0.5"))).not.toBe("-1");
     expect(safe(() => calculate("(-1)^(1/2)"))).not.toBe("-1");
+    expect(safe(() => calculate("(-1)^(3/4)"))).not.toBe("-1");
   });
 
   it("should handle exponentiating to 0", () => {
@@ -362,6 +365,7 @@ describe("evaluate", () => {
     expect(calculate("1!")).toBe("1");
     expect(calculate("5!")).toBe("120");
     expect(calculate("0!")).toBe("1");
+    expect(safe(() => calculate("(-1)!"))).not.toBe("-1");
   });
 
   it("should handle factorial of a big number", () => {
