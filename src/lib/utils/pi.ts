@@ -3,7 +3,7 @@ import type { NormalValue, PrecisionOptions } from "#lib/types";
 import { arctan } from "./arctan";
 import { simplify } from "./simplify";
 
-export function calculatePi(precision: PrecisionOptions): NormalValue {
+export function computePi(precision: PrecisionOptions): NormalValue {
   const p5 = arctan({ n: 1n, d: 5n }, precision);
   const p239 = arctan({ n: 1n, d: 239n }, precision);
 

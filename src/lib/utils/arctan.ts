@@ -2,7 +2,7 @@ import { getPrecisionDigits } from "#lib/options";
 import type { NormalValue, PrecisionOptions } from "#lib/types";
 
 import { getConst, ZERO } from "./constants";
-import { calculatePi } from "./pi";
+import { computePi } from "./pi";
 import { simplify } from "./simplify";
 
 function rawArctanSeries(
@@ -55,13 +55,13 @@ function arctan(v: NormalValue, precision: PrecisionOptions): NormalValue {
   if (absN === absD) {
     const pi = getConst("pi", precision);
     const n = isNegative ? -pi.n : pi.n;
-    return simplify({ ...pi, n, d: pi.d * 4n });
+    return simplify({ c: pi.c, n, d: pi.d * 4n });
   }
 
   // --- IDENTITY 1: Handle Values Bigger Than 1 (Reflection) ---
   // arctan(x) = pi/2 - arctan(1/x)
   if (absN > absD) {
-    const pi = calculatePi(precision);
+    const pi = computePi(precision);
     // Reciprocal input is 1/x -> invert numerator and denominator
     const subArctan = arctan({ n: absD, d: absN }, precision);
 

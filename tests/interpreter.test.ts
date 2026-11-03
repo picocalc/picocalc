@@ -7,7 +7,6 @@ import {
   MismatchedParenthesisError,
   OverflowError,
 } from "#lib/errors";
-import { E } from "#lib/utils/constants";
 import { calculate } from "#src";
 
 const win32 = process.platform === "win32";
@@ -22,6 +21,8 @@ function safe<T>(fn: () => T) {
 
 const PI_TO_72_DECIMALS =
   "3.141592653589793238462643383279502884197169399375105820974944592307816406";
+const E_TO_72_DECIMALS =
+  "2.71828182845904523536028747135266249775724709369995957496696762772407663";
 
 describe("evaluate", () => {
   it("should handle a number", () => {
@@ -424,6 +425,12 @@ describe("evaluate", () => {
     expect(calculate("arctan(-2)", { maxDecimals: 64 })).toBe(
       "-1.1071487177940905030170654601785370400700476454014326466765392074",
     );
+    expect(calculate("arctan(4/5)", { maxDecimals: 50 })).toBe(
+      "0.67474094222355266305652097360981361507400625484071",
+    );
+    expect(calculate("arctan(-4/5)", { maxDecimals: 50 })).toBe(
+      "-0.67474094222355266305652097360981361507400625484071",
+    );
   }, 200);
 
   it("should handle floor function in precise mode", () => {
@@ -541,9 +548,9 @@ describe("evaluate", () => {
 
   it("should handle a constant in decimal mode", () => {
     expect(calculate("pi", { maxDecimals: 72 })).toBe(PI_TO_72_DECIMALS);
-    expect(calculate("e")).toBe(E);
+    expect(calculate("e", { maxDecimals: 72 })).toBe(E_TO_72_DECIMALS);
     expect(calculate("1pi", { maxDecimals: 72 })).toBe(PI_TO_72_DECIMALS);
-    expect(calculate("1e")).toBe(E);
+    expect(calculate("1e", { maxDecimals: 72 })).toBe(E_TO_72_DECIMALS);
   });
 
   it("should handle a constant in precise mode", () => {
@@ -818,6 +825,7 @@ describe("evaluate - error handling", () => {
       expect(() => calculate("ceil(10^10^10)")).toThrow(OverflowError);
       expect(() => calculate("floor(10^10^10)")).toThrow(OverflowError);
       expect(() => calculate("sqrt(10^10^10)")).toThrow(OverflowError);
+      expect(() => calculate("arctan(10^10^10)")).toThrow(OverflowError);
       expect(() => calculate("(10^10^10)!")).toThrow(OverflowError);
       expect(() => calculate("(10^10^10) + 1")).toThrow(OverflowError);
       expect(() => calculate("(10^10^10) ^ 10")).toThrow(OverflowError);
