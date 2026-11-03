@@ -425,6 +425,12 @@ describe("evaluate", () => {
     expect(calculate("arctan(-2)", { maxDecimals: 64 })).toBe(
       "-1.1071487177940905030170654601785370400700476454014326466765392074",
     );
+    expect(calculate("arctan(4/5)", { maxDecimals: 50 })).toBe(
+      "0.67474094222355266305652097360981361507400625484071",
+    );
+    expect(calculate("arctan(-4/5)", { maxDecimals: 50 })).toBe(
+      "-0.67474094222355266305652097360981361507400625484071",
+    );
   }, 200);
 
   it("should handle floor function in precise mode", () => {
@@ -819,6 +825,7 @@ describe("evaluate - error handling", () => {
       expect(() => calculate("ceil(10^10^10)")).toThrow(OverflowError);
       expect(() => calculate("floor(10^10^10)")).toThrow(OverflowError);
       expect(() => calculate("sqrt(10^10^10)")).toThrow(OverflowError);
+      expect(() => calculate("arctan(10^10^10)")).toThrow(OverflowError);
       expect(() => calculate("(10^10^10)!")).toThrow(OverflowError);
       expect(() => calculate("(10^10^10) + 1")).toThrow(OverflowError);
       expect(() => calculate("(10^10^10) ^ 10")).toThrow(OverflowError);
