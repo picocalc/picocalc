@@ -12,6 +12,14 @@ import { calculate } from "#src";
 
 const win32 = process.platform === "win32";
 
+function safe<T>(fn: () => T) {
+  try {
+    return fn();
+  } catch (e) {
+    return e;
+  }
+}
+
 describe("evaluate", () => {
   it("should handle a number", () => {
     expect(calculate("1")).toBe("1");
@@ -285,6 +293,21 @@ describe("evaluate", () => {
     expect(calculate("1 ^ 1e100")).toBe("1");
   });
 
+  it("should handle exponentiation of -1", () => {
+    expect(calculate("(-1)^0")).toBe("1");
+    expect(calculate("(-1)^1")).toBe("-1");
+    expect(calculate("(-1)^2")).toBe("1");
+    expect(calculate("(-1)^3")).toBe("-1");
+
+    expect(calculate("(-1)^(1/3)")).toBe("-1");
+    expect(calculate("(-1)^(2/3)")).toBe("1");
+    expect(calculate("(-1) ^ 1e100")).toBe("1");
+
+    expect(safe(() => calculate("(-1)^0.5"))).not.toBe("-1");
+    expect(safe(() => calculate("(-1)^(1/2)"))).not.toBe("-1");
+    expect(safe(() => calculate("(-1)^(3/4)"))).not.toBe("-1");
+  });
+
   it("should handle exponentiating to 0", () => {
     expect(calculate("0.5^0")).toBe("1");
     expect(calculate("(1/3)^0")).toBe("1");
@@ -342,6 +365,7 @@ describe("evaluate", () => {
     expect(calculate("1!")).toBe("1");
     expect(calculate("5!")).toBe("120");
     expect(calculate("0!")).toBe("1");
+    expect(safe(() => calculate("(-1)!"))).not.toBe("-1");
   });
 
   it("should handle factorial of a big number", () => {
@@ -426,6 +450,8 @@ describe("evaluate", () => {
     expect(calculate("sqrt(1)")).toBe("1");
     expect(calculate("sqrt(16)")).toBe("4");
     expect(calculate("sqrt 16")).toBe("4");
+
+    expect(safe(() => calculate("sqrt(-1)"))).not.toBe("-1");
   });
 
   it("should handle square root when using exponentiation", () => {
