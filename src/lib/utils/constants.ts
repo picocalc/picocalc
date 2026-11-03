@@ -1,20 +1,17 @@
-import type { NormalValue, ValueConstant } from "#lib/types";
+import type { NormalValue, PrecisionOptions, ValueConstant } from "#lib/types";
 
-const PI: string = Math.PI.toString();
+import { calculatePi } from "./pi";
+
 const E: string = Math.E.toString();
 
 const ZERO = { n: 0n, d: 1n } as const;
 const ONE = { n: 1n, d: 1n } as const;
 
-const constants: {
-  readonly e: typeof E;
-  readonly pi: typeof PI;
-} = {
-  e: E,
-  pi: PI,
-} as const;
+const constants: { readonly e: typeof E } = { e: E } as const;
 
-function getConst(id: ValueConstant): NormalValue {
+function getConst(id: ValueConstant, options: PrecisionOptions): NormalValue {
+  if (options.format === "precise") return { n: 1n, d: 1n, c: id };
+  if (id === "pi") return calculatePi(options);
   const c = constants[id];
   return {
     n: BigInt(c.replace(".", "")),
@@ -22,4 +19,4 @@ function getConst(id: ValueConstant): NormalValue {
   };
 }
 
-export { getConst, constants, PI, E, ZERO, ONE };
+export { getConst, E, ZERO, ONE };

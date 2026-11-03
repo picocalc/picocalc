@@ -1,4 +1,5 @@
 import { DivisionByZeroError } from "#lib/errors";
+import { MAX_DECIMALS } from "#lib/options";
 import { OverflowValue } from "#lib/types";
 import type { Value, ValueExponent } from "#lib/types";
 
@@ -7,7 +8,11 @@ import { ZERO } from "./constants";
 import { gcd } from "./gcd";
 import { simplify } from "./simplify";
 
-export function divide(left: Value, right: Value): Value {
+export function divide(
+  left: Value,
+  right: Value,
+  maxDecimals: number = MAX_DECIMALS,
+): Value {
   const lN = left.n;
   const rN = right.n;
 
@@ -28,6 +33,7 @@ export function divide(left: Value, right: Value): Value {
       add(
         { n: lE?.n ?? 1n, d: lE?.d ?? 1n },
         { n: rE?.n ?? 1n, d: rE?.d ?? 1n },
+        maxDecimals,
         true,
       ),
     );

@@ -5,11 +5,16 @@ import {
   OverflowError,
   NotImplementedError,
 } from "./errors";
+import {
+  MAX_FACTORIAL,
+  MAX_PRECISION,
+  MAX_SCIENTIFIC_NUMBER_EXPONENT,
+} from "./options";
 import type { ParsedToken } from "./parser";
-import type { PrecisionOptions } from "./types";
+import type { NormalValue, PrecisionOptions, Value } from "./types";
 import { OverflowValue } from "./types";
-import type { NormalValue, Value } from "./types";
 import { add } from "./utils/add";
+import { arctan } from "./utils/arctan";
 import { ceil } from "./utils/ceil";
 import { getConst } from "./utils/constants";
 import { divide } from "./utils/divide";
@@ -37,6 +42,7 @@ const precedence = {
   CEIL_FN: 8,
   FLOOR_FN: 8,
   SQRT_FN: 8,
+  ARCTAN_FN: 8,
   FACTORIAL: 10,
 } as const;
 
@@ -44,7 +50,11 @@ type StackOp = keyof typeof precedence;
 
 function isFunctionOp(op: StackOp) {
   return (
-    op === "ABS_FN" || op === "CEIL_FN" || op === "FLOOR_FN" || op === "SQRT_FN"
+    op === "ABS_FN" ||
+    op === "CEIL_FN" ||
+    op === "FLOOR_FN" ||
+    op === "SQRT_FN" ||
+    op === "ARCTAN_FN"
   );
 }
 
@@ -52,26 +62,12 @@ function isUnaryOperation(op: StackOp) {
   return op === "UNARY_PLUS" || op === "UNARY_MINUS" || isFunctionOp(op);
 }
 
-/**
- * Maximum allowed precision
- */
-const MAX_PRECISION = 50_000;
-
-/**
- * Maximum allowed factorial
- */
-const MAX_FACTORIAL = 20_000;
-
-/**
- * Maximum allowed exponent for scientific number notation
- */
-const MAX_SCIENTIFIC_NUMBER_EXPONENT = 3e5;
-
 export function evaluate(
   tokens: ParsedToken[],
   options: PrecisionOptions = {},
 ): NormalValue {
   if (tokens.length === 0) throw new EmptyExpressionError();
+  const { maxDecimals } = options;
 
   const values: Value[] = [];
   const ops: StackOp[] = [];
@@ -112,7 +108,7 @@ export function evaluate(
             values.push(OverflowValue);
             return;
           }
-          values.push({ n: ceil(toSimpleFraction(right)), d: 1n });
+          values.push({ n: ceil(toSimpleFraction(right, maxDecimals)), d: 1n });
           return;
         }
         case "FLOOR_FN": {
@@ -120,11 +116,22 @@ export function evaluate(
             values.push(OverflowValue);
             return;
           }
-          values.push({ n: floor(toSimpleFraction(right)), d: 1n });
+          values.push({
+            n: floor(toSimpleFraction(right, maxDecimals)),
+            d: 1n,
+          });
           return;
         }
         case "SQRT_FN": {
           values.push(sqrt(right, options));
+          return;
+        }
+        case "ARCTAN_FN": {
+          if (right.n === "OVERFLOW") {
+            values.push(OverflowValue);
+            return;
+          }
+          values.push(arctan(toSimpleFraction(right, maxDecimals), options));
           return;
         }
       }
@@ -155,16 +162,16 @@ export function evaluate(
     switch (op) {
       case "ADD":
       case "SUBTRACT": {
-        values.push(add(left, right, op === "SUBTRACT"));
+        values.push(add(left, right, maxDecimals, op === "SUBTRACT"));
         return;
       }
       case "MULTIPLY":
       case "IMPLICIT_MUL": {
-        values.push(multiply(left, right));
+        values.push(multiply(left, right, maxDecimals));
         return;
       }
       case "DIVIDE": {
-        values.push(divide(left, right));
+        values.push(divide(left, right, maxDecimals));
         return;
       }
       case "MOD": {
@@ -238,11 +245,7 @@ export function evaluate(
         break;
       }
       case "CONST": {
-        if (options.format === "precise") {
-          values.push({ n: 1n, d: 1n, c: token.id });
-        } else {
-          values.push(getConst(token.id));
-        }
+        values.push(getConst(token.id, options));
         break;
       }
       case "LPAREN":
@@ -327,6 +330,10 @@ export function evaluate(
           }
           case "sqrt": {
             pushOpWithPrecedence("SQRT_FN", token.pos);
+            break;
+          }
+          case "arctan": {
+            pushOpWithPrecedence("ARCTAN_FN", token.pos);
             break;
           }
         }

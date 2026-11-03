@@ -1,3 +1,4 @@
+import { MAX_DECIMALS } from "#lib/options";
 import type { NormalValue, Value } from "#lib/types";
 
 import { ZERO } from "./constants";
@@ -7,6 +8,7 @@ import { toSimpleFraction } from "./simplify";
 export function add<V extends Value>(
   left: V,
   right: V,
+  maxDecimals: number = MAX_DECIMALS,
   subtract: boolean = false,
 ): V | NormalValue {
   const lN = left.n;
@@ -38,7 +40,12 @@ export function add<V extends Value>(
   if (n === 0n) return ZERO;
 
   if (c !== rC || e?.n !== rE?.n) {
-    return add(toSimpleFraction(left), toSimpleFraction(right), subtract);
+    return add(
+      toSimpleFraction(left, maxDecimals),
+      toSimpleFraction(right, maxDecimals),
+      maxDecimals,
+      subtract,
+    );
   }
   return { n, d, c, e };
 }

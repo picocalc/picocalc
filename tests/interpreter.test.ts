@@ -7,7 +7,7 @@ import {
   MismatchedParenthesisError,
   OverflowError,
 } from "#lib/errors";
-import { E, PI } from "#lib/utils/constants";
+import { E } from "#lib/utils/constants";
 import { calculate } from "#src";
 
 const win32 = process.platform === "win32";
@@ -19,6 +19,9 @@ function safe<T>(fn: () => T) {
     return e;
   }
 }
+
+const PI_TO_72_DECIMALS =
+  "3.141592653589793238462643383279502884197169399375105820974944592307816406";
 
 describe("evaluate", () => {
   it("should handle a number", () => {
@@ -293,21 +296,6 @@ describe("evaluate", () => {
     expect(calculate("1 ^ 1e100")).toBe("1");
   });
 
-  it("should handle exponentiation of -1", () => {
-    expect(calculate("(-1)^0")).toBe("1");
-    expect(calculate("(-1)^1")).toBe("-1");
-    expect(calculate("(-1)^2")).toBe("1");
-    expect(calculate("(-1)^3")).toBe("-1");
-
-    expect(calculate("(-1)^(1/3)")).toBe("-1");
-    expect(calculate("(-1)^(2/3)")).toBe("1");
-    expect(calculate("(-1) ^ 1e100")).toBe("1");
-
-    expect(safe(() => calculate("(-1)^0.5"))).not.toBe("-1");
-    expect(safe(() => calculate("(-1)^(1/2)"))).not.toBe("-1");
-    expect(safe(() => calculate("(-1)^(3/4)"))).not.toBe("-1");
-  });
-
   it("should handle exponentiating to 0", () => {
     expect(calculate("0.5^0")).toBe("1");
     expect(calculate("(1/3)^0")).toBe("1");
@@ -419,6 +407,21 @@ describe("evaluate", () => {
     expect(calculate("ceil(e)")).toBe("3");
   });
 
+  it("should handle arctan function", () => {
+    expect(calculate("arctan(1/5)", { maxDecimals: 50 })).toBe(
+      "0.19739555984988075837004976519479029344758510378785",
+    );
+    expect(calculate("arctan(1/239)", { maxDecimals: 50 })).toBe(
+      "0.00418407600207472386453821495928545274104806530763",
+    );
+    expect(calculate("4arctan(1)", { maxDecimals: 72 })).toBe(
+      PI_TO_72_DECIMALS,
+    );
+    expect(calculate("arctan(2)", { maxDecimals: 64 })).toBe(
+      "1.1071487177940905030170654601785370400700476454014326466765392074",
+    );
+  }, 200);
+
   it("should handle floor function in precise mode", () => {
     expect(calculate("floor(pi)", { format: "precise" })).toBe("3");
     expect(calculate("floor(e)", { format: "precise" })).toBe("2");
@@ -526,9 +529,9 @@ describe("evaluate", () => {
   });
 
   it("should handle a constant in decimal mode", () => {
-    expect(calculate("pi")).toBe(PI);
+    expect(calculate("pi", { maxDecimals: 72 })).toBe(PI_TO_72_DECIMALS);
     expect(calculate("e")).toBe(E);
-    expect(calculate("1pi")).toBe(PI);
+    expect(calculate("1pi", { maxDecimals: 72 })).toBe(PI_TO_72_DECIMALS);
     expect(calculate("1e")).toBe(E);
   });
 
@@ -707,18 +710,29 @@ describe("evaluate", () => {
     expect(calculate("|-e|", { format: "precise" })).toBe("e");
   });
 
+  it("should handle exponentiation of -1 to an integer exponent", () => {
+    expect(calculate("(-1)^0")).toBe("1");
+    expect(calculate("(-1)^1")).toBe("-1");
+    expect(calculate("(-1)^2")).toBe("1");
+    expect(calculate("(-1)^3")).toBe("-1");
+  });
+
   it("should handle exponentiation of -1 to a decimal exponent", () => {
-    expect(calculate("(-1) ^ (2/3)")).toBe("1");
-    expect(calculate("(-1) ^ .4")).toBe("1");
-    expect(calculate("(-1) ^ (1/3)")).toBe("-1");
-    expect(calculate("(-1) ^ .2")).toBe("-1");
+    expect(calculate("(-1)^(2/3)")).toBe("1");
+    expect(calculate("(-1)^.4")).toBe("1");
+    expect(calculate("(-1)^(1/3)")).toBe("-1");
+    expect(calculate("(-1)^.2")).toBe("-1");
+
+    expect(safe(() => calculate("(-1)^0.5"))).not.toBe("-1");
+    expect(safe(() => calculate("(-1)^(1/2)"))).not.toBe("-1");
+    expect(safe(() => calculate("(-1)^(3/4)"))).not.toBe("-1");
   });
 
   it("should handle exponentiation of -1 to a reasonable exponent", () => {
-    expect(calculate("(-1) ^ (10 ^ 50)")).toBe("1");
-    expect(calculate("(-1) ^ 1e50")).toBe("1");
-    expect(calculate("(-1) ^ (10 ^ 5000)")).toBe("1");
-    expect(calculate("(-1) ^ 1e5000")).toBe("1");
+    expect(calculate("(-1)^(10^50)")).toBe("1");
+    expect(calculate("(-1)^1e50")).toBe("1");
+    expect(calculate("(-1)^(10^5000)")).toBe("1");
+    expect(calculate("(-1)^1e5000")).toBe("1");
   });
 
   it("should handle adding big fractions", () => {
@@ -731,10 +745,6 @@ describe("evaluate", () => {
       expect(() => calculate("10000!")).not.toThrow(RangeError);
       expect(() => calculate("10000!")).not.toThrow(OverflowError);
     }, 200);
-
-    it("should not throw OverflowError for not large exponentiation", () => {
-      expect(() => calculate("(10^2e5)^10")).not.toThrow(OverflowError);
-    });
 
     it("should not throw OverflowError for exponentiating decimal", () => {
       expect(() => calculate("e^2")).not.toThrow(OverflowError);
@@ -808,6 +818,12 @@ describe("evaluate - error handling", () => {
 });
 
 describe.skipIf(win32)("evaluate - large operations", () => {
+  describe("large exponentiation", () => {
+    it("should not throw OverflowError for not large exponentiation", () => {
+      expect(() => calculate("(10^2e5)^10")).not.toThrow(OverflowError);
+    });
+  });
+
   describe("adding a lot of numbers", () => {
     const getTest = (numbers: number) => {
       // oxlint-disable-next-line prefer-template

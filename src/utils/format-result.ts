@@ -1,3 +1,4 @@
+import { toDecimal } from "#lib/decimals";
 import type {
   NormalValue,
   ValueConstant,
@@ -42,37 +43,8 @@ function formatPrecise(v: NormalValue): string {
  * Converts Result to a Decimal or Fraction String.
  */
 function formatResult(v: NormalValue, options: PrecisionOptions = {}): string {
-  const { n, d } = v;
-
   if (options.format === "precise") return formatPrecise(v);
-
-  const { maxDecimals = 30, roundingMode = "round" } = options;
-
-  const isNegative = n < 0;
-
-  const factor = 10n ** BigInt(maxDecimals);
-  const absN = isNegative ? -n : n;
-
-  const numerator = absN * factor;
-
-  const roundOffset = roundingMode === "round" ? d / 2n : 0n;
-  const shiftedResult = (numerator + roundOffset) / d;
-
-  let resultStr = shiftedResult.toString();
-
-  if (resultStr.length <= maxDecimals) {
-    resultStr = resultStr.padStart(maxDecimals + 1, "0");
-  }
-
-  const splitIdx = resultStr.length - maxDecimals;
-  const integerPart = resultStr.slice(0, splitIdx);
-  const fractionalPart = resultStr.slice(splitIdx).replace(/0+$/, "");
-
-  const finalResult = fractionalPart
-    ? `${integerPart}.${fractionalPart}`
-    : integerPart;
-
-  return (isNegative && finalResult !== "0" ? "-" : "") + finalResult;
+  return toDecimal(v, options);
 }
 
 export { formatResult };
