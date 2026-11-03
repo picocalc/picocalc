@@ -13,14 +13,14 @@ function simplify(v: NormalValue): NormalValue {
   if (v.d === 0n) throw new DivisionByZeroError();
   if (v.n === 0n) return ZERO;
   if (v.d === 1n) {
-    if (v.e?.n === 0n) return { n: v.n, d: v.d };
+    if (v.e?.n === 0n || !v.c) return { n: v.n, d: v.d };
     return v;
   }
   const common = gcd(v.n, v.d);
   const sign = v.d < 0 ? -1n : 1n;
   const n = (v.n / common) * sign;
   const d = (v.d / common) * sign;
-  if (v.e?.n === 0n) return { n, d };
+  if (v.e?.n === 0n || !v.c) return { n, d };
   return { n, d, c: v.c, e: v.e };
 }
 
@@ -28,7 +28,7 @@ function simplify(v: NormalValue): NormalValue {
  * Resolves any constants and exponents to return a simple fraction.
  */
 function toSimpleFraction(val: NormalValue): NormalValue {
-  if (!val.c) return val;
+  if (!val.c) return { d: val.d, n: val.n };
 
   const c = getConst(val.c);
   const expN = val.e?.n ?? 1n;
