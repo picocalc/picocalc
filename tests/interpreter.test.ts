@@ -7,7 +7,6 @@ import {
   MismatchedParenthesisError,
   OverflowError,
 } from "#lib/errors";
-import { E } from "#lib/utils/constants";
 import { calculate } from "#src";
 
 const win32 = process.platform === "win32";
@@ -22,6 +21,8 @@ function safe<T>(fn: () => T) {
 
 const PI_TO_72_DECIMALS =
   "3.141592653589793238462643383279502884197169399375105820974944592307816406";
+const E_TO_72_DECIMALS =
+  "2.71828182845904523536028747135266249775724709369995957496696762772407663";
 
 describe("evaluate", () => {
   it("should handle a number", () => {
@@ -541,9 +542,9 @@ describe("evaluate", () => {
 
   it("should handle a constant in decimal mode", () => {
     expect(calculate("pi", { maxDecimals: 72 })).toBe(PI_TO_72_DECIMALS);
-    expect(calculate("e")).toBe(E);
+    expect(calculate("e", { maxDecimals: 72 })).toBe(E_TO_72_DECIMALS);
     expect(calculate("1pi", { maxDecimals: 72 })).toBe(PI_TO_72_DECIMALS);
-    expect(calculate("1e")).toBe(E);
+    expect(calculate("1e", { maxDecimals: 72 })).toBe(E_TO_72_DECIMALS);
   });
 
   it("should handle a constant in precise mode", () => {
