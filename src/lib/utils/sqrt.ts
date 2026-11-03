@@ -1,4 +1,5 @@
 import { NotImplementedError } from "#lib/errors";
+import { getPrecisionDigits } from "#lib/options";
 import type { PrecisionOptions, Value } from "#lib/types";
 
 import { ZERO } from "./constants";
@@ -57,7 +58,7 @@ export function sqrt(v: Value, precision: PrecisionOptions): Value {
     }
   }
 
-  const precisionDigits = Math.max(10, (precision.maxDecimals ?? 30) * 3);
+  const precisionDigits = getPrecisionDigits(precision.maxDecimals);
 
   // To get 'p' digits of precision in a fraction, we multiply the
   // numerator by 10^(2*p) before taking the integer sqrt.

@@ -1,3 +1,4 @@
+import { MAX_DECIMALS } from "#lib/options";
 import type { NormalValue, Value } from "#lib/types";
 
 import { add } from "./add";
@@ -5,7 +6,11 @@ import { ZERO } from "./constants";
 import { gcd } from "./gcd";
 import { simplify, toSimpleFraction } from "./simplify";
 
-export function multiply<V extends Value>(a: V, b: V): V | NormalValue {
+export function multiply<V extends Value>(
+  a: V,
+  b: V,
+  maxDecimals: number = MAX_DECIMALS,
+): V | NormalValue {
   const aN = a.n;
   const bN = b.n;
 
@@ -28,13 +33,18 @@ export function multiply<V extends Value>(a: V, b: V): V | NormalValue {
       add(
         { n: aE?.n ?? 1n, d: aE?.d ?? 1n },
         { n: bE?.n ?? 1n, d: bE?.d ?? 1n },
+        maxDecimals,
       ),
     );
     return { n, d, c: aC, e };
   }
 
   if (aC !== undefined && bC !== undefined) {
-    return multiply(toSimpleFraction(a), toSimpleFraction(b));
+    return multiply(
+      toSimpleFraction(a, maxDecimals),
+      toSimpleFraction(b, maxDecimals),
+      maxDecimals,
+    );
   }
 
   const c = aC ?? bC;

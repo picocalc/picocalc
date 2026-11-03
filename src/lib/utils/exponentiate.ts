@@ -1,8 +1,10 @@
+import { toDecimal } from "#lib/decimals";
 import { DivisionByZeroError } from "#lib/errors";
+import { getPrecisionDigits } from "#lib/options";
 import type { PrecisionOptions, Value } from "#lib/types";
 import { OverflowValue } from "#lib/types";
 
-import { ZERO, ONE, constants } from "./constants";
+import { ZERO, ONE, getConst } from "./constants";
 import { nthRoot } from "./nthroot";
 import { simplify, toSimpleFraction } from "./simplify";
 import { sqrt } from "./sqrt";
@@ -35,7 +37,7 @@ export function exponentiate(
     return ONE;
   }
 
-  const normalizedExp = toSimpleFraction(rS);
+  const normalizedExp = toSimpleFraction(rS, precision.maxDecimals);
   const dExp = normalizedExp.d;
   let exponent = normalizedExp.n;
 
@@ -45,8 +47,13 @@ export function exponentiate(
   }
 
   if (dExp >= 100) {
-    let baseFloat = Number(lN) / Number(lD);
-    if (c) baseFloat *= Number(constants[c]);
+    const maxDecimals = getPrecisionDigits(precision.maxDecimals);
+    let baseFloat = Number(toDecimal(left, { maxDecimals }));
+    if (c) {
+      baseFloat *= Number(
+        toDecimal(getConst(c, { maxDecimals }), { maxDecimals }),
+      );
+    }
     const expFloat = Number(exponent) / Number(dExp);
     const resultFloat = baseFloat ** expFloat;
     if (!Number.isFinite(resultFloat)) return OverflowValue;

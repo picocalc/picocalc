@@ -106,7 +106,8 @@ function resolveIdentifier(token: TokenIdentifier): TokenConst | TokenFn {
     token.id === "abs" ||
     token.id === "ceil" ||
     token.id === "floor" ||
-    token.id === "sqrt"
+    token.id === "sqrt" ||
+    token.id === "arctan"
   ) {
     return { type: "FUNC", id: token.id, pos };
   }

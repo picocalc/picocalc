@@ -1,4 +1,5 @@
 import { DivisionByZeroError, NotImplementedError } from "#lib/errors";
+import { getPrecisionDigits } from "#lib/options";
 import type { NormalValue, PrecisionOptions } from "#lib/types";
 
 import { ZERO } from "./constants";
@@ -69,7 +70,7 @@ export function nthRoot(
     }
   }
 
-  const precisionDigits = Math.max(10, (precision.maxDecimals ?? 30) * 3);
+  const precisionDigits = getPrecisionDigits(precision.maxDecimals);
 
   // 2. Fallback to high-precision approximation
   // To get 'p' digits of precision, we multiply the numerator by 10^(root * p)
