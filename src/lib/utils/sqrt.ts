@@ -3,7 +3,7 @@ import { getPrecisionDigits } from "#lib/options";
 import type { NormalValue, PrecisionOptions, Value } from "#lib/types";
 
 import { ZERO } from "./constants";
-import { simplify } from "./simplify";
+import { simplify, toSimpleFraction } from "./simplify";
 
 /**
  * Calculates the integer square root of a BigInt.
@@ -66,7 +66,8 @@ export function sqrt<V extends Value>(
   // To get 'p' digits of precision in a fraction, we multiply the
   // numerator by 10^(2*p) before taking the integer sqrt.
   const scaleFactor = 10n ** BigInt(precisionDigits * 2);
-  const scaledNumerator = (v.n * scaleFactor) / v.d;
+  const s = toSimpleFraction(v);
+  const scaledNumerator = (s.n * scaleFactor) / s.d;
 
   const n = isqrt(scaledNumerator);
   const d = 10n ** BigInt(precisionDigits);

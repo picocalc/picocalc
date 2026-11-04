@@ -211,9 +211,10 @@ describe("evaluate", () => {
   });
 
   function expectToPreserveCorrectness(expression: string) {
-    expect(calculate(calculate(expression, { format: "precise" }))).toBe(
-      calculate(expression),
-    );
+    expect(
+      calculate(calculate(expression, { format: "precise" })),
+      `Should preserve correctness for ${expression}`,
+    ).toBe(calculate(expression));
   }
 
   it("should correctly add 2 constants in precise mode", () => {
@@ -314,14 +315,12 @@ describe("evaluate", () => {
   });
 
   it("should handle exponentiation of decimals in decimal mode", () => {
-    const decimals = (maxDecimals: number) => ({
-      format: "decimal" as const,
-      maxDecimals,
-    });
-    expect(calculate("(1/3)^pi", decimals(12))).toBe("0.031701467835");
-    expect(calculate("e^pi", decimals(12))).toBe("23.140692632779");
-    expect(calculate("pi^(1/3)", decimals(15))).toBe("1.464591887561523");
-    expect(calculate("sqrt(pi)", decimals(10))).toBe("1.7724538509");
+    expect(calculate("(1/3)^pi", { maxDecimals: 12 })).toBe("0.031701467835");
+    expect(calculate("e^pi", { maxDecimals: 12 })).toBe("23.140692632779");
+    expect(calculate("pi^(1/3)", { maxDecimals: 15 })).toBe(
+      "1.464591887561523",
+    );
+    expect(calculate("sqrt(pi)", { maxDecimals: 10 })).toBe("1.7724538509");
   });
 
   it("should handle a simple remainder division", () => {
@@ -451,6 +450,14 @@ describe("evaluate", () => {
     expect(calculate("arctanh(-0.9)", { maxDecimals: 100 })).toBe(
       "-1.4722194895832202300045137159439267686186896306495644092689801182046463510320986443570791919078699479",
     );
+  }, 200);
+
+  it("should handle ln function", () => {
+    expect(calculate("ln(1)")).toBe("0");
+    expect(calculate("ln(e)")).toBe("1");
+    expect(calculate("ln(2)", { maxDecimals: 100 })).toBe(LN_2_TO_100_DECIMALS);
+    expect(calculate("1e25 (1-ln(e))", { format: "precise" })).toBe("0");
+    expect(calculate("1e25 (1-ln(e))")).toBe("0");
   }, 200);
 
   it("should handle floor function in precise mode", () => {

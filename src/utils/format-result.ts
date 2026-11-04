@@ -5,6 +5,7 @@ import type {
   ValueExponent,
   PrecisionOptions,
 } from "#lib/types";
+import { toSimpleFraction } from "#lib/utils/simplify";
 
 function getConstantStr(coeff: bigint, c?: ValueConstant, e?: ValueExponent) {
   if (coeff === 0n) return "0";
@@ -44,7 +45,7 @@ function formatPrecise(v: NormalValue): string {
  */
 function formatResult(v: NormalValue, options: PrecisionOptions = {}): string {
   if (options.format === "precise") return formatPrecise(v);
-  return toDecimal(v, options);
+  return toDecimal(toSimpleFraction(v, options.maxDecimals), options);
 }
 
 export { formatResult };

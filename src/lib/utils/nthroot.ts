@@ -3,7 +3,7 @@ import { getPrecisionDigits } from "#lib/options";
 import type { NormalValue, PrecisionOptions } from "#lib/types";
 
 import { ZERO } from "./constants";
-import { simplify } from "./simplify";
+import { simplify, toSimpleFraction } from "./simplify";
 
 /**
  * Calculates the integer nth root of a BigInt.
@@ -78,7 +78,8 @@ export function nthRoot(
   const scaleFactor = 10n ** scalePower;
 
   // Bring the fraction into a single BigInt space: (n/d) * 10^(root * p)
-  const scaledValue = (v.n * scaleFactor) / v.d;
+  const s = toSimpleFraction(v);
+  const scaledValue = (s.n * scaleFactor) / s.d;
 
   const resultN = iNthRoot(scaledValue, n);
   const resultD = 10n ** BigInt(precisionDigits);
