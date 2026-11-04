@@ -8,9 +8,25 @@ import type {
 } from "./lexer";
 import { getSym } from "./symbol";
 
-interface TokenFn extends TokenBase {
+const KNOWN_FUNCTIONS = new Set([
+  "abs",
+  "arctan",
+  "arctanh",
+  "ceil",
+  "floor",
+  "ln",
+  "sqrt",
+] as const);
+type ExtractSetType<T> = T extends Set<infer U> ? U : never;
+type FnName = ExtractSetType<typeof KNOWN_FUNCTIONS>;
+
+function isKnownFunctionName(name: string): name is FnName {
+  return KNOWN_FUNCTIONS.has(name as FnName);
+}
+
+export interface TokenFn extends TokenBase {
   readonly type: "FUNC";
-  readonly id: string;
+  readonly id: FnName;
 }
 
 interface TokenConst extends TokenBase {
@@ -102,14 +118,7 @@ function resolveIdentifier(token: TokenIdentifier): TokenConst | TokenFn {
   if (token.id === "pi" || token.id === "e") {
     return { type: "CONST", id: token.id, pos };
   }
-  if (
-    token.id === "abs" ||
-    token.id === "ceil" ||
-    token.id === "floor" ||
-    token.id === "sqrt" ||
-    token.id === "arctan" ||
-    token.id === "arctanh"
-  ) {
+  if (isKnownFunctionName(token.id)) {
     return { type: "FUNC", id: token.id, pos };
   }
   throw new ParserError(`Unknown identifier '${token.id}'`, token.pos);

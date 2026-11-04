@@ -10,18 +10,18 @@ import {
   MAX_PRECISION,
   MAX_SCIENTIFIC_NUMBER_EXPONENT,
 } from "./options";
-import type { ParsedToken } from "./parser";
+import type { ParsedToken, TokenFn } from "./parser";
 import type { NormalValue, PrecisionOptions, Value } from "./types";
 import { OverflowValue } from "./types";
 import { add } from "./utils/add";
 import { arctan } from "./utils/arctan";
 import { arctanh } from "./utils/arctanh";
 import { ceil } from "./utils/ceil";
-import { getConst } from "./utils/constants";
 import { divide } from "./utils/divide";
 import { exponentiate } from "./utils/exponentiate";
 import { factorial } from "./utils/factorial";
 import { floor } from "./utils/floor";
+import { ln } from "./utils/ln";
 import { mod } from "./utils/mod";
 import { multiply } from "./utils/multiply";
 import { simplify, toSimpleFraction } from "./utils/simplify";
@@ -57,9 +57,7 @@ type OperatorType =
   | "IMPLICIT_MUL"
   | "FACTORIAL";
 
-type FunctionOp = { type: "FN_CALL"; name: string };
-
-type StackOp = OperatorType | FunctionOp;
+type StackOp = OperatorType | TokenFn;
 
 function isFunctionOp(op: StackOp) {
   return typeof op === "object";
@@ -110,7 +108,7 @@ export function evaluate(
         }
       }
 
-      if (op.name === "sqrt") {
+      if (op.id === "sqrt") {
         values.push(sqrt(right, options));
         return;
       }
@@ -120,7 +118,7 @@ export function evaluate(
         return;
       }
 
-      switch (op.name) {
+      switch (op.id) {
         case "abs": {
           const n = rN < 0 ? -rN : rN;
           values.push({ ...right, n });
@@ -143,6 +141,10 @@ export function evaluate(
         }
         case "arctanh": {
           values.push(arctanh(toSimpleFraction(right, maxDecimals), options));
+          return;
+        }
+        case "ln": {
+          values.push(ln(right, options));
           return;
         }
       }
@@ -256,7 +258,7 @@ export function evaluate(
         break;
       }
       case "CONST": {
-        values.push(getConst(token.id, options));
+        values.push({ n: 1n, d: 1n, c: token.id });
         break;
       }
       case "LPAREN":
@@ -326,7 +328,7 @@ export function evaluate(
         break;
       }
       case "FUNC": {
-        pushOpWithPrecedence({ type: "FN_CALL", name: token.id }, token.pos);
+        pushOpWithPrecedence(token, token.pos);
         break;
       }
     }
