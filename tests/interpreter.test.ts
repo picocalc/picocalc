@@ -616,7 +616,9 @@ describe("evaluate", () => {
     expect(calculate("2pi^2", { maxDecimals: 50 })).toBe(
       DOUBLE_OF_PI_SQUARED_TO_50_DECIMALS,
     );
-    expect(calculate("pi^-1", { maxDecimals: 4 })).toBe("0.3183");
+    expect(calculate("pi^-1", { maxDecimals: 80 })).toBe(
+      "0.31830988618379067153776752674502872406891929148091289749533468811779359526845307",
+    );
   });
 
   it("should handle exponentiation of a constant in precise mode", () => {
