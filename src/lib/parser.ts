@@ -13,6 +13,7 @@ const KNOWN_FUNCTIONS = new Set([
   "arctan",
   "arctanh",
   "ceil",
+  "exp",
   "floor",
   "ln",
   "sqrt",
