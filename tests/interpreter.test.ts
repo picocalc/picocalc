@@ -3,6 +3,7 @@ import { describe, it, expect } from "bun:test";
 import {
   DivisionByZeroError,
   EmptyExpressionError,
+  InterpreterRangeError,
   MaximumPrecisionError,
   MismatchedParenthesisError,
   OverflowError,
@@ -23,6 +24,9 @@ const PI_TO_72_DECIMALS =
   "3.141592653589793238462643383279502884197169399375105820974944592307816406";
 const E_TO_72_DECIMALS =
   "2.71828182845904523536028747135266249775724709369995957496696762772407663";
+
+const LN_2_TO_100_DECIMALS =
+  "0.6931471805599453094172321214581765680755001343602552541206800094933936219696947156058633269964186875";
 
 describe("evaluate", () => {
   it("should handle a number", () => {
@@ -433,6 +437,22 @@ describe("evaluate", () => {
     );
   }, 200);
 
+  it("should handle arctanh function", () => {
+    expect(calculate("arctanh(0)")).toBe("0");
+    expect(calculate("arctanh(0.5)", { maxDecimals: 100 })).toBe(
+      "0.5493061443340548456976226184612628523237452789113747258673471668187471466093044834368078774068660444",
+    );
+    expect(calculate("arctanh(-1/2)", { maxDecimals: 100 })).toBe(
+      "-0.5493061443340548456976226184612628523237452789113747258673471668187471466093044834368078774068660444",
+    );
+    expect(calculate("2arctanh(1/3)", { maxDecimals: 100 })).toBe(
+      LN_2_TO_100_DECIMALS,
+    );
+    expect(calculate("arctanh(-0.9)", { maxDecimals: 100 })).toBe(
+      "-1.4722194895832202300045137159439267686186896306495644092689801182046463510320986443570791919078699479",
+    );
+  }, 200);
+
   it("should handle floor function in precise mode", () => {
     expect(calculate("floor(pi)", { format: "precise" })).toBe("3");
     expect(calculate("floor(e)", { format: "precise" })).toBe("2");
@@ -833,6 +853,11 @@ describe("evaluate - error handling", () => {
       expect(() => calculate("|(10^10^10)|")).toThrow(OverflowError);
       expect(() => calculate("10^10^10^10 % 9^9^9^9")).toThrow(OverflowError);
     }, 200);
+  });
+
+  it("should throw InterpreterRangeError for invalid function inputs", () => {
+    expect(() => calculate("arctanh(1)")).toThrow(InterpreterRangeError);
+    expect(() => calculate("arctanh(-2)")).toThrow(InterpreterRangeError);
   });
 });
 
