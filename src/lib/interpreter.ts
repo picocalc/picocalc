@@ -15,6 +15,7 @@ import type { NormalValue, PrecisionOptions, Value } from "./types";
 import { OverflowValue } from "./types";
 import { add } from "./utils/add";
 import { arctan } from "./utils/arctan";
+import { arctanh } from "./utils/arctanh";
 import { ceil } from "./utils/ceil";
 import { getConst } from "./utils/constants";
 import { divide } from "./utils/divide";
@@ -38,28 +39,41 @@ const precedence = {
   UNARY_MINUS: 4,
   EXP: 6,
   IMPLICIT_MUL: 6,
-  ABS_FN: 8,
-  CEIL_FN: 8,
-  FLOOR_FN: 8,
-  SQRT_FN: 8,
-  ARCTAN_FN: 8,
+  FN_CALL: 8,
   FACTORIAL: 10,
 } as const;
 
-type StackOp = keyof typeof precedence;
+type OperatorType =
+  | "LPAREN"
+  | "ABS_OPEN"
+  | "ADD"
+  | "SUBTRACT"
+  | "MULTIPLY"
+  | "DIVIDE"
+  | "MOD"
+  | "UNARY_PLUS"
+  | "UNARY_MINUS"
+  | "EXP"
+  | "IMPLICIT_MUL"
+  | "FACTORIAL";
+
+type FunctionOp = { type: "FN_CALL"; name: string };
+
+type StackOp = OperatorType | FunctionOp;
 
 function isFunctionOp(op: StackOp) {
-  return (
-    op === "ABS_FN" ||
-    op === "CEIL_FN" ||
-    op === "FLOOR_FN" ||
-    op === "SQRT_FN" ||
-    op === "ARCTAN_FN"
-  );
+  return typeof op === "object";
 }
 
 function isUnaryOperation(op: StackOp) {
   return op === "UNARY_PLUS" || op === "UNARY_MINUS" || isFunctionOp(op);
+}
+
+function getOpPrecedence(op: StackOp): number {
+  if (typeof op === "object") {
+    return precedence.FN_CALL;
+  }
+  return precedence[op];
 }
 
 export function evaluate(
@@ -79,13 +93,14 @@ export function evaluate(
     const right = values.pop()!;
 
     if (isUnaryOperation(op)) {
+      const rN = right.n;
+
       switch (op) {
         case "UNARY_PLUS": {
           values.push(right);
           return;
         }
         case "UNARY_MINUS": {
-          const rN = right.n;
           if (rN === "OVERFLOW") {
             values.push(OverflowValue);
             return;
@@ -93,45 +108,41 @@ export function evaluate(
           values.push({ ...right, n: -rN });
           return;
         }
-        case "ABS_FN": {
-          const rN = right.n;
-          if (rN === "OVERFLOW") {
-            values.push(OverflowValue);
-            return;
-          }
+      }
+
+      if (op.name === "sqrt") {
+        values.push(sqrt(right, options));
+        return;
+      }
+
+      if (rN === "OVERFLOW") {
+        values.push(OverflowValue);
+        return;
+      }
+
+      switch (op.name) {
+        case "abs": {
           const n = rN < 0 ? -rN : rN;
           values.push({ ...right, n });
           return;
         }
-        case "CEIL_FN": {
-          if (right.n === "OVERFLOW") {
-            values.push(OverflowValue);
-            return;
-          }
+        case "ceil": {
           values.push({ n: ceil(toSimpleFraction(right, maxDecimals)), d: 1n });
           return;
         }
-        case "FLOOR_FN": {
-          if (right.n === "OVERFLOW") {
-            values.push(OverflowValue);
-            return;
-          }
+        case "floor": {
           values.push({
             n: floor(toSimpleFraction(right, maxDecimals)),
             d: 1n,
           });
           return;
         }
-        case "SQRT_FN": {
-          values.push(sqrt(right, options));
+        case "arctan": {
+          values.push(arctan(toSimpleFraction(right, maxDecimals), options));
           return;
         }
-        case "ARCTAN_FN": {
-          if (right.n === "OVERFLOW") {
-            values.push(OverflowValue);
-            return;
-          }
-          values.push(arctan(toSimpleFraction(right, maxDecimals), options));
+        case "arctanh": {
+          values.push(arctanh(toSimpleFraction(right, maxDecimals), options));
           return;
         }
       }
@@ -199,8 +210,8 @@ export function evaluate(
       ops.length > 0 &&
       !isUnary &&
       (isRightAssociative
-        ? precedence[ops.at(-1)!] > precedence[currentOp]
-        : precedence[ops.at(-1)!] >= precedence[currentOp])
+        ? getOpPrecedence(ops.at(-1)!) > getOpPrecedence(currentOp)
+        : getOpPrecedence(ops.at(-1)!) >= getOpPrecedence(currentOp))
     ) {
       applyOp(pos);
     }
@@ -315,28 +326,7 @@ export function evaluate(
         break;
       }
       case "FUNC": {
-        switch (token.id) {
-          case "abs": {
-            pushOpWithPrecedence("ABS_FN", token.pos);
-            break;
-          }
-          case "ceil": {
-            pushOpWithPrecedence("CEIL_FN", token.pos);
-            break;
-          }
-          case "floor": {
-            pushOpWithPrecedence("FLOOR_FN", token.pos);
-            break;
-          }
-          case "sqrt": {
-            pushOpWithPrecedence("SQRT_FN", token.pos);
-            break;
-          }
-          case "arctan": {
-            pushOpWithPrecedence("ARCTAN_FN", token.pos);
-            break;
-          }
-        }
+        pushOpWithPrecedence({ type: "FN_CALL", name: token.id }, token.pos);
         break;
       }
     }

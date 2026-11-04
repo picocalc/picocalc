@@ -49,6 +49,12 @@ export class EmptyExpressionError extends InterpreterError {
   }
 }
 
+export class InterpreterRangeError extends InterpreterError {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
 export class MismatchedParenthesisError extends InterpreterError {
   constructor(pos: number, message: string = "Mismatched parenthesis") {
     super(message, pos);

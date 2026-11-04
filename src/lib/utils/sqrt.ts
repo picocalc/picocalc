@@ -1,6 +1,6 @@
 import { NotImplementedError } from "#lib/errors";
 import { getPrecisionDigits } from "#lib/options";
-import type { PrecisionOptions, Value } from "#lib/types";
+import type { NormalValue, PrecisionOptions, Value } from "#lib/types";
 
 import { ZERO } from "./constants";
 import { simplify } from "./simplify";
@@ -37,7 +37,10 @@ function isPerfectSquare(val: bigint): [boolean, bigint] {
   return [root * root === val, root];
 }
 
-export function sqrt(v: Value, precision: PrecisionOptions): Value {
+export function sqrt<V extends Value>(
+  v: V,
+  precision: PrecisionOptions,
+): V | NormalValue {
   if (v.n === "OVERFLOW") return v;
 
   if (v.n < 0) {
