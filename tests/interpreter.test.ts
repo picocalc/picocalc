@@ -24,9 +24,14 @@ const PI_TO_72_DECIMALS =
   "3.141592653589793238462643383279502884197169399375105820974944592307816406";
 const E_TO_72_DECIMALS =
   "2.71828182845904523536028747135266249775724709369995957496696762772407663";
-
 const LN_2_TO_100_DECIMALS =
   "0.6931471805599453094172321214581765680755001343602552541206800094933936219696947156058633269964186875";
+const EXP_PI_TO_110_DECIMALS =
+  "23.1406926327792690057290863679485473802661062426002119934450464095243423506904527835169719970675492196759527048";
+const PI_SQUARED_TO_50_DECIMALS =
+  "9.86960440108935861883449099987615113531369940724079";
+const DOUBLE_OF_PI_SQUARED_TO_50_DECIMALS =
+  "19.73920880217871723766898199975230227062739881448158";
 
 describe("evaluate", () => {
   it("should handle a number", () => {
@@ -315,8 +320,12 @@ describe("evaluate", () => {
   });
 
   it("should handle exponentiation of decimals in decimal mode", () => {
-    expect(calculate("(1/3)^pi", { maxDecimals: 12 })).toBe("0.031701467835");
-    expect(calculate("e^pi", { maxDecimals: 12 })).toBe("23.140692632779");
+    expect(calculate("(1/3)^pi", { maxDecimals: 40 })).toBe(
+      "0.0317014678351419047094871568993193259637",
+    );
+    expect(calculate("e^pi", { maxDecimals: 110 })).toBe(
+      EXP_PI_TO_110_DECIMALS,
+    );
     expect(calculate("pi^(1/3)", { maxDecimals: 15 })).toBe(
       "1.464591887561523",
     );
@@ -458,6 +467,19 @@ describe("evaluate", () => {
     expect(calculate("ln(2)", { maxDecimals: 100 })).toBe(LN_2_TO_100_DECIMALS);
     expect(calculate("1e25 (1-ln(e))", { format: "precise" })).toBe("0");
     expect(calculate("1e25 (1-ln(e))")).toBe("0");
+    expect(calculate("ln(1e100)", { maxDecimals: 200 })).toBe(
+      "230.25850929940456840179914546843642076011014886287729760333279009675726096773524802359972050895982983419677840422862486334095254650828067566662873690987816894829072083255546808437998948262331985283935053",
+    );
+  }, 200);
+
+  it("should handle exp function", () => {
+    expect(calculate("exp(0)")).toBe("1");
+    expect(calculate("exp(1)", { maxDecimals: 72 })).toBe(E_TO_72_DECIMALS);
+    expect(calculate("exp(1)", { format: "precise" })).toBe("e");
+    expect(calculate("exp(2)", { format: "precise" })).toBe("e^2");
+    expect(calculate("exp(pi)", { maxDecimals: 110 })).toBe(
+      EXP_PI_TO_110_DECIMALS,
+    );
   }, 200);
 
   it("should handle floor function in precise mode", () => {
@@ -588,9 +610,15 @@ describe("evaluate", () => {
   });
 
   it("should handle exponentiation of a constant in decimal mode", () => {
-    expect(calculate("pi^2", { maxDecimals: 4 })).toBe("9.8696");
-    expect(calculate("2pi^2", { maxDecimals: 4 })).toBe("19.7392");
-    expect(calculate("pi^-1", { maxDecimals: 4 })).toBe("0.3183");
+    expect(calculate("pi^2", { maxDecimals: 50 })).toBe(
+      PI_SQUARED_TO_50_DECIMALS,
+    );
+    expect(calculate("2pi^2", { maxDecimals: 50 })).toBe(
+      DOUBLE_OF_PI_SQUARED_TO_50_DECIMALS,
+    );
+    expect(calculate("pi^-1", { maxDecimals: 80 })).toBe(
+      "0.31830988618379067153776752674502872406891929148091289749533468811779359526845307",
+    );
   });
 
   it("should handle exponentiation of a constant in precise mode", () => {
@@ -620,8 +648,12 @@ describe("evaluate", () => {
   });
 
   it("should handle multiplying constants in decimal mode", () => {
-    expect(calculate("pi * pi", { maxDecimals: 4 })).toBe("9.8696");
-    expect(calculate("2 * pi * pi", { maxDecimals: 4 })).toBe("19.7392");
+    expect(calculate("pi * pi", { maxDecimals: 50 })).toBe(
+      PI_SQUARED_TO_50_DECIMALS,
+    );
+    expect(calculate("2 * pi * pi", { maxDecimals: 50 })).toBe(
+      DOUBLE_OF_PI_SQUARED_TO_50_DECIMALS,
+    );
   });
 
   it("should handle multiplying constants in precise mode", () => {

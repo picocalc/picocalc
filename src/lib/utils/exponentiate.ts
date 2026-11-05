@@ -1,10 +1,11 @@
-import { toDecimal } from "#lib/decimals";
 import { DivisionByZeroError } from "#lib/errors";
 import { getPrecisionDigits } from "#lib/options";
 import type { PrecisionOptions, Value } from "#lib/types";
 import { OverflowValue } from "#lib/types";
 
-import { ZERO, ONE, getConst } from "./constants";
+import { ONE, ZERO } from "./constants";
+import { rawExp } from "./exp";
+import { ln } from "./ln";
 import { nthRoot } from "./nthroot";
 import { simplify, toSimpleFraction } from "./simplify";
 import { sqrt } from "./sqrt";
@@ -48,20 +49,21 @@ export function exponentiate(
 
   if (dExp >= 100) {
     const maxDecimals = getPrecisionDigits(precision.maxDecimals);
-    let baseFloat = Number(toDecimal(left, { maxDecimals }));
-    if (c) {
-      baseFloat *= Number(
-        toDecimal(getConst(c, { maxDecimals }), { maxDecimals }),
-      );
+    const lS = toSimpleFraction(left, maxDecimals);
+    const rS = toSimpleFraction(right, maxDecimals);
+
+    try {
+      const lnBase = ln(lS, { maxDecimals });
+      const SCALE = 10n ** BigInt(maxDecimals);
+      const lnBaseScaled = (lnBase.n * SCALE) / lnBase.d;
+      const rightScaled = (rS.n * SCALE) / rS.d;
+      const productScaled = (lnBaseScaled * rightScaled) / SCALE;
+
+      const productVal = { n: productScaled, d: SCALE };
+      return rawExp(productVal, precision);
+    } catch {
+      return OverflowValue;
     }
-    const expFloat = Number(exponent) / Number(dExp);
-    const resultFloat = baseFloat ** expFloat;
-    if (!Number.isFinite(resultFloat)) return OverflowValue;
-    const [integerPart, fractionalPart] = resultFloat.toString().split(".");
-    if (!fractionalPart) return simplify({ n: BigInt(integerPart!), d: 1n });
-    const denominator = 10n ** BigInt(fractionalPart.length);
-    const numerator = BigInt(integerPart + fractionalPart);
-    return simplify({ n: numerator, d: denominator });
   }
 
   const eN = (left.e?.n ?? 1n) * exponent;

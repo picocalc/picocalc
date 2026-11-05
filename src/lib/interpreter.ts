@@ -18,6 +18,7 @@ import { arctan } from "./utils/arctan";
 import { arctanh } from "./utils/arctanh";
 import { ceil } from "./utils/ceil";
 import { divide } from "./utils/divide";
+import { exp } from "./utils/exp";
 import { exponentiate } from "./utils/exponentiate";
 import { factorial } from "./utils/factorial";
 import { floor } from "./utils/floor";
@@ -86,7 +87,8 @@ export function evaluate(
 
   const applyOp = (pos?: number): void => {
     const op = ops.pop();
-    if (!op || op === "LPAREN" || op === "ABS_OPEN") return;
+    if (!op || op === "LPAREN" || op === "ABS_OPEN" || op === "UNARY_PLUS")
+      return;
 
     const right = values.pop()!;
 
@@ -94,10 +96,6 @@ export function evaluate(
       const rN = right.n;
 
       switch (op) {
-        case "UNARY_PLUS": {
-          values.push(right);
-          return;
-        }
         case "UNARY_MINUS": {
           if (rN === "OVERFLOW") {
             values.push(OverflowValue);
@@ -108,7 +106,9 @@ export function evaluate(
         }
       }
 
-      if (op.id === "sqrt") {
+      const { id } = op;
+
+      if (id === "sqrt") {
         values.push(sqrt(right, options));
         return;
       }
@@ -118,7 +118,7 @@ export function evaluate(
         return;
       }
 
-      switch (op.id) {
+      switch (id) {
         case "abs": {
           const n = rN < 0 ? -rN : rN;
           values.push({ ...right, n });
@@ -147,7 +147,13 @@ export function evaluate(
           values.push(ln(right, options));
           return;
         }
+        case "exp": {
+          values.push(exp(right, options));
+          return;
+        }
       }
+
+      id satisfies never;
     }
 
     if (op === "FACTORIAL") {
