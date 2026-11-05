@@ -341,6 +341,22 @@ describe("evaluate", () => {
 
   it("should handle a remainder division with decimals", () => {
     expect(calculate("2.5 % 2")).toBe("0.5");
+    expect(safe(() => calculate("pi % 2"))).not.toBeOneOf(["0", "1"]);
+    expect(safe(() => calculate("e % 2"))).not.toBeOneOf(["0", "1"]);
+    expect(safe(() => calculate("pi % e"))).not.toBeOneOf(["0", "1"]);
+    expect(safe(() => calculate("e % pi"))).not.toBeOneOf(["0", "1"]);
+    expect(
+      safe(() => calculate("pi % 2", { format: "precise" })),
+    ).not.toBeOneOf(["0", "1"]);
+    expect(safe(() => calculate("e % 2", { format: "precise" }))).not.toBeOneOf(
+      ["0", "1"],
+    );
+    expect(
+      safe(() => calculate("pi % e", { format: "precise" })),
+    ).not.toBeOneOf(["0", "1"]);
+    expect(
+      safe(() => calculate("e % pi", { format: "precise" })),
+    ).not.toBeOneOf(["0", "1"]);
   });
 
   it("should throw DivisionByZeroError for remainder division by 0", () => {
@@ -367,6 +383,10 @@ describe("evaluate", () => {
     expect(calculate("5!")).toBe("120");
     expect(calculate("0!")).toBe("1");
     expect(safe(() => calculate("(-1)!"))).not.toBe("-1");
+    expect(safe(() => calculate("(pi)!"))).not.toBe("1");
+    expect(safe(() => calculate("(e)!"))).not.toBe("1");
+    expect(safe(() => calculate("(pi)!", { format: "precise" }))).not.toBe("1");
+    expect(safe(() => calculate("(e)!", { format: "precise" }))).not.toBe("1");
   });
 
   it("should handle factorial of a big number", () => {

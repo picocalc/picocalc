@@ -161,7 +161,7 @@ export function evaluate(
         values.push(OverflowValue);
         return;
       }
-      const reduced = simplify(right);
+      const reduced = toSimpleFraction(simplify(right));
       if (reduced.d !== 1n || reduced.n < 0) {
         throw new NotImplementedError(
           "Factorial is only implemented for non-negative integers.",
@@ -198,7 +198,7 @@ export function evaluate(
           values.push(OverflowValue);
           return;
         }
-        values.push(mod(left, right));
+        values.push(mod(toSimpleFraction(left), toSimpleFraction(right)));
         return;
       }
       case "EXP": {
