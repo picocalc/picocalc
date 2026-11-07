@@ -72,5 +72,5 @@ export function sqrt<V extends Value>(
   const n = isqrt(scaledNumerator);
   const d = 10n ** BigInt(precisionDigits);
 
-  return simplify({ n, d });
+  return { n, d };
 }

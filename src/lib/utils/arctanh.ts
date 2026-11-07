@@ -1,27 +1,24 @@
 import { InterpreterRangeError } from "#lib/errors";
-import { getPrecisionDigits } from "#lib/options";
+import { getBitPrecision } from "#lib/options";
 import type { NormalValue, PrecisionOptions } from "#lib/types";
 
 import { ZERO } from "./constants";
-import { simplify } from "./simplify";
-import { sqrt } from "./sqrt";
 
-function rawArctanhSeries(xScaled: bigint, SCALE: bigint): bigint {
+function rawArctanhSeries(xScaled: bigint, bitPrecision: bigint) {
   let currentTerm = xScaled;
   let totalSum = xScaled;
-  const xSqScaled = (xScaled * xScaled) / SCALE;
+
+  const xSqScaled = (xScaled * xScaled) >> bitPrecision;
+
   let k = 1n;
 
   while (true) {
-    currentTerm = (currentTerm * xSqScaled) / SCALE;
+    currentTerm = (currentTerm * xSqScaled) >> bitPrecision;
     const denominatorFactor = 2n * k + 1n;
-    const termValue = currentTerm / denominatorFactor;
 
-    if (termValue === 0n) {
-      break;
-    }
+    if (currentTerm < denominatorFactor) break;
 
-    totalSum += termValue;
+    totalSum += currentTerm / denominatorFactor;
     k++;
   }
 
@@ -32,15 +29,12 @@ function arctanh(v: NormalValue, precision: PrecisionOptions): NormalValue {
   const { n, d } = v;
   if (n === 0n) return ZERO;
 
-  const precisionDigits = getPrecisionDigits(precision.maxDecimals);
-  const SCALE = 10n ** BigInt(precisionDigits);
+  const bitPrecision = BigInt(getBitPrecision(precision.maxDecimals));
 
-  let currentN = n;
-  let currentD = d;
+  const isNegative = n < 0n !== d < 0n;
 
-  const isNegative = currentN < 0n !== currentD < 0n;
-  currentN = currentN < 0n ? -currentN : currentN;
-  currentD = currentD < 0n ? -currentD : currentD;
+  const currentN = n < 0n ? -n : n;
+  const currentD = d < 0n ? -d : d;
 
   if (currentN >= currentD) {
     throw new InterpreterRangeError(
@@ -48,35 +42,11 @@ function arctanh(v: NormalValue, precision: PrecisionOptions): NormalValue {
     );
   }
 
-  // Argument reduction: shrink x using arctanh(x) = 2 * arctanh(x / (1 + sqrt(1 - x^2)))
-  // until x is safely below 0.5 for fast series convergence.
-  let reductions = 0n;
-  const threshold = SCALE / 2n; // 0.5
+  const xScaled = (currentN << bitPrecision) / currentD;
 
-  let xScaled = (currentN * SCALE) / currentD;
+  const sumScaled = rawArctanhSeries(xScaled, bitPrecision);
 
-  while (xScaled > threshold) {
-    // 1 - x^2
-    const xSq = (xScaled * xScaled) / SCALE;
-    const oneMinusXsq = SCALE - xSq;
-
-    // sqrt(1 - x^2)
-    const sqrtVal = sqrt({ n: oneMinusXsq, d: SCALE }, precision);
-    const sqrtScaled = (sqrtVal.n * SCALE) / sqrtVal.d;
-
-    // new_x = x / (1 + sqrt)
-    const denom = SCALE + sqrtScaled;
-    xScaled = (xScaled * SCALE) / denom;
-    reductions++;
-  }
-
-  // Compute series on the reduced small argument
-  let sumScaled = rawArctanhSeries(xScaled, SCALE);
-
-  // Scale back up by multiplying by 2^reductions
-  sumScaled <<= reductions;
-
-  return simplify({ n: isNegative ? -sumScaled : sumScaled, d: SCALE });
+  return { n: isNegative ? -sumScaled : sumScaled, d: 1n << bitPrecision };
 }
 
 export { arctanh };

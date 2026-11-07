@@ -1,5 +1,4 @@
 import { InterpreterRangeError } from "#lib/errors";
-import { getPrecisionDigits } from "#lib/options";
 import type { NormalValue, PrecisionOptions } from "#lib/types";
 
 import { arctanh } from "./arctanh";
@@ -18,39 +17,27 @@ function ln(v: NormalValue, precision: PrecisionOptions): NormalValue {
     return e ? { n: e.n, d: e.d ?? 1n } : ONE;
   }
 
-  let { n: currentN, d: currentD } = toSimpleFraction(v);
-
-  const precisionDigits = getPrecisionDigits(precision.maxDecimals);
-  const SCALE = 10n ** BigInt(precisionDigits);
+  let { n: sN, d: sD } = toSimpleFraction(v);
 
   // Handle values < 1 using ln(x) = -ln(1/x)
-  const isReciprocal = currentN * SCALE < currentD * SCALE;
-  if (currentN * SCALE < currentD * SCALE) {
-    currentN = d;
-    currentD = n;
+  const isReciprocal = sN < sD;
+  if (isReciprocal) {
+    [sN, sD] = [sD, sN];
   }
 
   let m = 0;
 
-  // Argument reduction: use square roots to bring current value close to 1
-  // While x >= 2, x = sqrt(x), and we multiply the final result by 2
-  while (currentN * SCALE >= 2n * currentD * SCALE) {
-    const val = sqrt({ n: currentN, d: currentD }, precision);
-    currentN = val.n;
-    currentD = val.d;
+  // Argument reduction: bring value close to 1 via sqrt
+  // While x >= 2, x = sqrt(x), accumulating factor 2^m
+  while (sN >= 2n * sD) {
+    const val = sqrt({ n: sN, d: sD }, precision);
+    sN = val.n;
+    sD = val.d;
     m++;
   }
 
-  // Apply identity: arctanh((u - 1) / (u + 1))
-  // u - 1 = (currentN - currentD) / currentD
-  // u + 1 = (currentN + currentD) / currentD
-  // Ratio simplifies to (currentN - currentD) / (currentN + currentD)
-  const argN = currentN - currentD;
-  const argD = currentN + currentD;
+  const at = arctanh({ n: sN - sD, d: sN + sD }, precision);
 
-  const at = arctanh({ n: argN, d: argD }, precision);
-
-  // Multiply by 2 from the identity: ln(u) = 2 * arctanh(...)
   let rN = at.n * 2n;
 
   // Account for square root reductions: multiply by 2^m
