@@ -27,6 +27,7 @@ import { mod } from "./utils/mod";
 import { multiply } from "./utils/multiply";
 import { simplify, toSimpleFraction } from "./utils/simplify";
 import { sqrt } from "./utils/sqrt";
+import { cos, sin } from "./utils/trig";
 
 const precedence = {
   LPAREN: 0,
@@ -142,6 +143,14 @@ export function evaluate(
         }
         case "exp": {
           values.push(exp(right, options));
+          return;
+        }
+        case "sin": {
+          values.push(sin(right, options));
+          return;
+        }
+        case "cos": {
+          values.push(cos(right, options));
           return;
         }
       }

@@ -540,6 +540,58 @@ describe("evaluate", () => {
     );
   }, 200);
 
+  describe("sin and cos", () => {
+    it("should handle sin function", () => {
+      expect(calculate("sin(1)", { maxDecimals: 50 })).toBe(
+        "0.84147098480789650665250232163029899962256306079837",
+      );
+      expect(calculate("sin(1/2)", { maxDecimals: 40 })).toBe(
+        "0.4794255386042030002732879352155713880818",
+      );
+      expect(calculate("sin(-1)", { maxDecimals: 50 })).toBe(
+        "-0.84147098480789650665250232163029899962256306079837",
+      );
+
+      expect(calculate("sin(-pi)")).toBe("0");
+      expect(calculate("sin(-pi/2)")).toBe("-1");
+      expect(calculate("sin(0)")).toBe("0");
+      expect(calculate("sin(pi/2)")).toBe("1");
+      expect(calculate("sin(pi)")).toBe("0");
+      expect(calculate("sin(3pi/2)")).toBe("-1");
+      expect(calculate("sin(2pi)")).toBe("0");
+      expect(calculate("sin(1e100pi)")).toBe("0");
+
+      expect(calculate("sin(e)", { maxDecimals: 40 })).toBe(
+        "0.4107812905029086954760094920183605918883",
+      );
+    }, 200);
+
+    it("should handle cos function", () => {
+      expect(calculate("cos(1)", { maxDecimals: 40 })).toBe(
+        "0.5403023058681397174009366074429766037323",
+      );
+      expect(calculate("cos(1/2)", { maxDecimals: 50 })).toBe(
+        "0.87758256189037271611628158260382965199164519710974",
+      );
+      expect(calculate("cos(-1)", { maxDecimals: 40 })).toBe(
+        "0.5403023058681397174009366074429766037323",
+      );
+
+      expect(calculate("cos(-pi)")).toBe("-1");
+      expect(calculate("cos(-pi/2)")).toBe("0");
+      expect(calculate("cos(0)")).toBe("1");
+      expect(calculate("cos(pi/2)")).toBe("0");
+      expect(calculate("cos(pi)")).toBe("-1");
+      expect(calculate("cos(3pi/2)")).toBe("0");
+      expect(calculate("cos(2pi)")).toBe("1");
+      expect(calculate("cos(1e100pi)")).toBe("1");
+
+      expect(calculate("cos(e)", { maxDecimals: 40 })).toBe(
+        "-0.9117339147869650978937173178054318452504",
+      );
+    }, 200);
+  });
+
   it("should handle floor function in precise mode", () => {
     expect(calculate("floor(pi)", { format: "precise" })).toBe("3");
     expect(calculate("floor(e)", { format: "precise" })).toBe("2");

@@ -13,9 +13,11 @@ type FnName =
   | "arctan"
   | "arctanh"
   | "ceil"
+  | "cos"
   | "exp"
   | "floor"
   | "ln"
+  | "sin"
   | "sqrt";
 
 const KNOWN_FUNCTIONS = new Set<FnName>([
@@ -23,9 +25,11 @@ const KNOWN_FUNCTIONS = new Set<FnName>([
   "arctan",
   "arctanh",
   "ceil",
+  "cos",
   "exp",
   "floor",
   "ln",
+  "sin",
   "sqrt",
 ]);
 
