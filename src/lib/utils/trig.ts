@@ -3,6 +3,15 @@ import type { NormalValue, PrecisionOptions } from "#lib/types";
 
 import { ONE, ZERO } from "./constants";
 import { computePi } from "./pi";
+import { toSimpleFraction } from "./simplify";
+
+function roundDiv(numerator: bigint, denominator: bigint): bigint {
+  const twice = numerator * 2n;
+  const absTwice = twice < 0n ? -twice : twice;
+  const absDenom = denominator < 0n ? -denominator : denominator;
+  const quotient = (absTwice + absDenom) / (2n * absDenom);
+  return twice < 0n !== denominator < 0n ? -quotient : quotient;
+}
 
 function rawSinSeries(rScaled: bigint, bitPrecision: bigint): bigint {
   const rSqScaled = (rScaled * rScaled) >> bitPrecision;
@@ -67,23 +76,40 @@ function getHalfPi(precision: PrecisionOptions): NormalValue {
 }
 
 function sin(v: NormalValue, precision: PrecisionOptions): NormalValue {
-  const { n, d } = v;
+  const { n, d, c, e } = v;
   if (n === 0n) return ZERO;
 
   const bitPrecision = BigInt(getBitPrecision(precision.maxDecimals));
   const scale = 1n << bitPrecision;
 
-  const halfPi = getHalfPi(precision);
+  const isPiLinear = c === "pi" && (e === undefined || e.n === 1n);
 
-  const divNum = n * halfPi.d;
-  const divDen = d * halfPi.n;
+  let rScaled: bigint;
+  let k: bigint;
 
-  const k = (divNum + divDen / 2n) / divDen;
+  if (isPiLinear) {
+    k = roundDiv(2n * n, d);
+    const rN = 2n * n - k * d;
+    if (rN === 0n) {
+      const quadrant = ((k % 4n) + 4n) % 4n;
+      if (quadrant === 0n || quadrant === 2n) return ZERO;
+      if (quadrant === 1n) return ONE;
+      return { n: -1n, d: 1n };
+    }
+    const piVal = computePi(precision);
+    rScaled = (rN * piVal.n * scale) / (2n * d * piVal.d);
+  } else {
+    const simple = toSimpleFraction(v);
+    const halfPi = getHalfPi(precision);
 
-  const rN = n * halfPi.d - k * halfPi.n * d;
-  const rD = d * halfPi.d;
+    const divNum = simple.n * halfPi.d;
+    const divDen = simple.d * halfPi.n;
+    k = roundDiv(divNum, divDen);
 
-  const rScaled = (rN * scale) / rD;
+    const rN = simple.n * halfPi.d - k * halfPi.n * simple.d;
+    const rD = simple.d * halfPi.d;
+    rScaled = (rN * scale) / rD;
+  }
 
   const quadrant = ((k % 4n) + 4n) % 4n;
 
@@ -111,22 +137,41 @@ function sin(v: NormalValue, precision: PrecisionOptions): NormalValue {
 }
 
 function cos(v: NormalValue, precision: PrecisionOptions): NormalValue {
-  const { n, d } = v;
+  const { n, d, c, e } = v;
   if (n === 0n) return ONE;
 
   const bitPrecision = BigInt(getBitPrecision(precision.maxDecimals));
   const scale = 1n << bitPrecision;
 
-  const halfPi = getHalfPi(precision);
+  const isPiLinear = c === "pi" && (e === undefined || e.n === 1n);
 
-  const divNum = n * halfPi.d;
-  const divDen = d * halfPi.n;
-  const k = (divNum + divDen / 2n) / divDen;
+  let rScaled: bigint;
+  let k: bigint;
 
-  const rN = n * halfPi.d - k * halfPi.n * d;
-  const rD = d * halfPi.d;
+  if (isPiLinear) {
+    k = roundDiv(2n * n, d);
+    const rN = 2n * n - k * d;
+    if (rN === 0n) {
+      const quadrant = ((k % 4n) + 4n) % 4n;
+      if (quadrant === 0n || quadrant === 2n) {
+        return quadrant === 0n ? ONE : { n: -1n, d: 1n };
+      }
+      return ZERO;
+    }
+    const piVal = computePi(precision);
+    rScaled = (rN * piVal.n * scale) / (2n * d * piVal.d);
+  } else {
+    const simple = toSimpleFraction(v);
+    const halfPi = getHalfPi(precision);
 
-  const rScaled = (rN * scale) / rD;
+    const divNum = simple.n * halfPi.d;
+    const divDen = simple.d * halfPi.n;
+    k = roundDiv(divNum, divDen);
+
+    const rN = simple.n * halfPi.d - k * halfPi.n * simple.d;
+    const rD = simple.d * halfPi.d;
+    rScaled = (rN * scale) / rD;
+  }
 
   const quadrant = ((k % 4n) + 4n) % 4n;
 
