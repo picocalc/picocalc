@@ -4,7 +4,7 @@ import type { NormalValue, PrecisionOptions } from "#lib/types";
 
 import { arctanh } from "./arctanh";
 import { ONE } from "./constants";
-import { simplify } from "./simplify";
+import { simplify, toSimpleFraction } from "./simplify";
 import { sqrt } from "./sqrt";
 
 function ln(v: NormalValue, precision: PrecisionOptions): NormalValue {
@@ -14,16 +14,14 @@ function ln(v: NormalValue, precision: PrecisionOptions): NormalValue {
     throw new InterpreterRangeError("Logarithm of non-positive number");
   }
 
-  if (c === "e") {
+  if (c === "e" && n === d) {
     return e ? { n: e.n, d: e.d ?? 1n } : ONE;
   }
 
+  let { n: currentN, d: currentD } = toSimpleFraction(v);
+
   const precisionDigits = getPrecisionDigits(precision.maxDecimals);
   const SCALE = 10n ** BigInt(precisionDigits);
-
-  let currentN = n;
-  let currentD = d;
-  let m = 0;
 
   // Handle values < 1 using ln(x) = -ln(1/x)
   const isReciprocal = currentN * SCALE < currentD * SCALE;
@@ -31,6 +29,8 @@ function ln(v: NormalValue, precision: PrecisionOptions): NormalValue {
     currentN = d;
     currentD = n;
   }
+
+  let m = 0;
 
   // Argument reduction: use square roots to bring current value close to 1
   // While x >= 2, x = sqrt(x), and we multiply the final result by 2

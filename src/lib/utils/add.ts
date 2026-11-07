@@ -5,6 +5,12 @@ import { ZERO } from "./constants";
 import { gcd } from "./gcd";
 import { toSimpleFraction } from "./simplify";
 
+export function negate<V extends Value>(v: V): V {
+  if (v.n === "OVERFLOW") return v;
+  const { n, d } = v;
+  return { ...v, n: d < 0 ? n : -n, d: d < 0 ? -d : d };
+}
+
 export function add<V extends Value>(
   left: V,
   right: V,
@@ -14,17 +20,13 @@ export function add<V extends Value>(
   const lN = left.n;
   const rN = right.n;
 
-  if (lN === "OVERFLOW") return left;
-  if (rN === "OVERFLOW") return right;
+  if (lN === "OVERFLOW" || rN === 0n) return left;
+  if (rN === "OVERFLOW" || lN === 0n) return subtract ? negate(right) : right;
 
   const { d: lD, c, e } = left;
   const { d: rD, c: rC, e: rE } = right;
 
-  if (lN === 0n) return { n: subtract ? -rN : rN, d: rD, c: rC, e: rE };
-  if (rN === 0n) return { n: lN, d: lD, c, e };
-
-  let n: bigint;
-  let d: bigint;
+  let n: bigint, d: bigint;
 
   if (lD === rD) {
     n = subtract ? lN - rN : lN + rN;
@@ -35,6 +37,11 @@ export function add<V extends Value>(
     const mRight = lD / common;
     n = subtract ? lN * mLeft - rN * mRight : lN * mLeft + rN * mRight;
     d = lD * mLeft;
+  }
+
+  if (n < 0n && d < 0n) {
+    n = -n;
+    d = -d;
   }
 
   if (n === 0n) return ZERO;

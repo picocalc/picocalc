@@ -158,6 +158,12 @@ describe("evaluate", () => {
     expect(calculate("-(1 + 1)")).toBe("-2");
   });
 
+  it("should handle double negatives", () => {
+    expect(calculate("-(1/-1)")).toBe("1");
+    expect(calculate("0 - (1/-1)")).toBe("1");
+    expect(calculate("-1 - (2/-1)")).toBe("1");
+  });
+
   it("should handle implicit multiplication", () => {
     expect(calculate("2(2)")).toBe("4");
     expect(calculate("2(3+4)")).toBe("14");
@@ -516,6 +522,12 @@ describe("evaluate", () => {
     expect(calculate("ln(1e100)", { maxDecimals: 200 })).toBe(
       "230.25850929940456840179914546843642076011014886287729760333279009675726096773524802359972050895982983419677840422862486334095254650828067566662873690987816894829072083255546808437998948262331985283935053",
     );
+
+    expect(calculate("ln(pi)", { maxDecimals: 15 })).toBe("1.1447298858494");
+    expect(calculate("ln(2pi)", { maxDecimals: 10 })).toBe("1.8378770664");
+    expect(calculate("ln(2e)", { maxDecimals: 15 })).toBe("1.693147180559945");
+
+    expect(calculate("ln(-(1/-1))")).toBe("0");
   }, 200);
 
   it("should handle exp function", () => {

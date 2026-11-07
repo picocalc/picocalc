@@ -13,7 +13,7 @@ import {
 import type { ParsedToken, TokenFn } from "./parser";
 import type { NormalValue, PrecisionOptions, Value } from "./types";
 import { OverflowValue } from "./types";
-import { add } from "./utils/add";
+import { add, negate } from "./utils/add";
 import { arctan } from "./utils/arctan";
 import { arctanh } from "./utils/arctanh";
 import { ceil } from "./utils/ceil";
@@ -93,17 +93,9 @@ export function evaluate(
     const right = values.pop()!;
 
     if (isUnaryOperation(op)) {
-      const rN = right.n;
-
-      switch (op) {
-        case "UNARY_MINUS": {
-          if (rN === "OVERFLOW") {
-            values.push(OverflowValue);
-            return;
-          }
-          values.push({ ...right, n: -rN });
-          return;
-        }
+      if (op === "UNARY_MINUS") {
+        values.push(negate(right));
+        return;
       }
 
       const { id } = op;
@@ -113,15 +105,16 @@ export function evaluate(
         return;
       }
 
-      if (rN === "OVERFLOW") {
+      const n = right.n;
+
+      if (n === "OVERFLOW") {
         values.push(OverflowValue);
         return;
       }
 
       switch (id) {
         case "abs": {
-          const n = rN < 0 ? -rN : rN;
-          values.push({ ...right, n });
+          values.push({ ...right, n: n < 0 ? -n : n });
           return;
         }
         case "ceil": {
