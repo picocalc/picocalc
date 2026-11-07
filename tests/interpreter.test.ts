@@ -102,6 +102,14 @@ describe("evaluate", () => {
       expect(calculate("sqrt(4) !")).toBe("2");
       expect(calculate("sqrt(4!)", { maxDecimals: 12 })).toBe("4.898979485566");
       expect(calculate("sqrt 4!", { maxDecimals: 12 })).toBe("4.898979485566");
+
+      expect(calculate("ln e^2")).toBe("2");
+      expect(calculate("ln(e^2)")).toBe("2");
+      expect(calculate("ln(e)^2")).toBe("1");
+      expect(calculate("(ln e)^2")).toBe("1");
+      expect(calculate("sqrt(4)2")).toBe("4");
+      expect(calculate("sqrt 2(2)")).toBe("2");
+      expect(calculate("sqrt(2(2))")).toBe("2");
     });
   });
 

@@ -36,12 +36,12 @@ const precedence = {
   MULTIPLY: 2,
   DIVIDE: 2,
   MOD: 2,
-  UNARY_PLUS: 4,
-  UNARY_MINUS: 4,
-  EXP: 6,
-  IMPLICIT_MUL: 6,
-  FN_CALL: 8,
-  FACTORIAL: 10,
+  UNARY_PLUS: 3,
+  UNARY_MINUS: 3,
+  FN_CALL: 4,
+  EXP: 5,
+  IMPLICIT_MUL: 5,
+  FACTORIAL: 6,
 } as const;
 
 type OperatorType =
