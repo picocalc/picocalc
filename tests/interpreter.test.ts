@@ -73,12 +73,70 @@ describe("evaluate", () => {
     expect(calculate("3 * 4")).toBe("12");
   });
 
-  it("should respect operator precedence (PEMDAS/BODMAS)", () => {
-    expect(calculate("1 + 2 * 3")).toBe("7");
-    expect(calculate("2 * 3 + 1")).toBe("7");
-    expect(calculate("10 - 2 * 4")).toBe("2");
-    expect(calculate("10 * 2 - 4")).toBe("16");
-    expect(calculate("1 + 5 % 3")).toBe("3");
+  describe("operation precedence order", () => {
+    it("should respect operator precedence (PEMDAS/BODMAS)", () => {
+      expect(calculate("1 + 2 * 3")).toBe("7");
+      expect(calculate("2 * 3 + 1")).toBe("7");
+      expect(calculate("10 - 2 * 4")).toBe("2");
+      expect(calculate("10 * 2 - 4")).toBe("16");
+      expect(calculate("1 + 5 % 3")).toBe("3");
+    });
+
+    it("should handle order of implicit multiplication", () => {
+      expect(calculate("2 + 2(1 + 1)")).toBe("6");
+      expect(calculate("8 - 2(1 + 2)")).toBe("2");
+      expect(calculate("2 * 2(1 + 2)")).toBe("12");
+      expect(calculate("6 / 2(1 + 2)")).toBe("1");
+    });
+
+    it("should handle order of exponentiation", () => {
+      expect(calculate("-2^2")).toBe("-4");
+      expect(calculate("-2^2^3")).toBe("-256");
+    });
+
+    it("should handle order of functions", () => {
+      expect(calculate("sqrt 4 + 5")).toBe("7");
+      expect(calculate("sqrt 4 * 4")).toBe("8");
+      expect(calculate("sqrt(4 + 5)")).toBe("3");
+      expect(calculate("sqrt(4 * 4)")).toBe("4");
+
+      expect(calculate("abs -2")).toBe("2");
+      expect(calculate("abs(-2)")).toBe("2");
+      expect(calculate("-abs 2")).toBe("-2");
+      expect(calculate("-abs(2)")).toBe("-2");
+    });
+
+    it("should handle order of implicit multiplication with exponentiation", () => {
+      expect(calculate("2 ^ 3(1+2)")).toBe("512");
+      expect(calculate("2 ^ 2(2)")).toBe("16");
+      expect(calculate("2(1+2)^3")).toBe("54");
+      expect(calculate("2(2)^2")).toBe("8");
+    });
+
+    it("should handle order of exponentiation with factorial", () => {
+      expect(calculate("3!^3")).toBe("216");
+      expect(calculate("3^3!")).toBe("729");
+    });
+
+    it("should handle order of functions with factorial", () => {
+      expect(calculate("( sqrt(4) )!")).toBe("2");
+      expect(calculate("sqrt(4) !")).toBe("2");
+      expect(calculate("sqrt(4!)", { maxDecimals: 12 })).toBe("4.898979485566");
+      expect(calculate("sqrt 4!", { maxDecimals: 12 })).toBe("4.898979485566");
+    });
+
+    it("should handle order of functions with implicit multiplication", () => {
+      expect(calculate("sqrt(4)2")).toBe("4");
+      expect(calculate("sqrt 2(2)")).toBe("2");
+      expect(calculate("sqrt(2(2))")).toBe("2");
+    });
+
+    it("should handle order of functions with exponentiation", () => {
+      expect(calculate("ln e^2")).toBe("2");
+      expect(calculate("ln(e^2)")).toBe("2");
+      expect(calculate("ln(e)^2")).toBe("1");
+      expect(calculate("(ln e)^2")).toBe("1");
+    });
   });
 
   it("should handle unary operators with multiplication", () => {
@@ -110,16 +168,6 @@ describe("evaluate", () => {
     expect(calculate("(1 + 2")).toBe("3");
   });
 
-  it("should correctly handle order of implicit multiplication", () => {
-    expect(calculate("2 + 2(1 + 1)")).toBe("6");
-    expect(calculate("2 * 2(1 + 2)")).toBe("12");
-    expect(calculate("8 - 2(1 + 2)")).toBe("2");
-  });
-
-  it("should have have higher precedence for implicit multiplication than division", () => {
-    expect(calculate("6 / 2(1 + 2)")).toBe("1");
-  });
-
   it("should throw DivisionByZeroError for division by 0", () => {
     expect(() => calculate("1/0")).toThrow(DivisionByZeroError);
     expect(() => calculate("0/0")).toThrow(DivisionByZeroError);
@@ -134,16 +182,6 @@ describe("evaluate", () => {
     expect(() => calculate("0/2")).not.toThrow(DivisionByZeroError);
 
     expect(calculate("0/1")).toBe("0");
-  });
-
-  it("should have have higher precedence for implicit multiplication than exponentiation", () => {
-    expect(calculate("2 ^ 3(1+2)")).toBe("512");
-    expect(calculate("2 ^ 2(2)")).toBe("16");
-  });
-
-  it("should have have higher precedence for exponentiation than implicit multiplication", () => {
-    expect(calculate("2(1+2)^3")).toBe("54");
-    expect(calculate("2(2)^2")).toBe("8");
   });
 
   it("should correctly handle a decimal", () => {
@@ -260,11 +298,6 @@ describe("evaluate", () => {
   it("should follow right-associativity for exponentiation", () => {
     expect(calculate("2^3^2")).toBe("512");
     expect(calculate("2^2^3")).toBe("256");
-  });
-
-  it("should have higher precedence for exponentiation", () => {
-    expect(calculate("-2^2")).toBe("-4");
-    expect(calculate("-2^2^3")).toBe("-256");
   });
 
   it("should handle negative exponentiation", () => {
@@ -403,13 +436,6 @@ describe("evaluate", () => {
     expect(calculate("(3)!2")).toBe("12");
     expect(calculate("(3)!(2)")).toBe("12");
     expect(calculate("(2)3!")).toBe("12");
-  });
-
-  it("should handle factorial with functions", () => {
-    expect(calculate("( sqrt(4) )!")).toBe("2");
-    expect(calculate("sqrt(4) !")).toBe("2");
-    expect(calculate("sqrt( 4! )", { maxDecimals: 12 })).toBe("4.898979485566");
-    expect(calculate("sqrt 4!", { maxDecimals: 12 })).toBe("4.898979485566");
   });
 
   it("should handle absolute values using pipe operator", () => {
