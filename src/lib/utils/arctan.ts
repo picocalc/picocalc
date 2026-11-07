@@ -1,30 +1,20 @@
-import { getPrecisionDigits } from "#lib/options";
+import { getBitPrecision } from "#lib/options";
 import type { NormalValue, PrecisionOptions } from "#lib/types";
 
 import { getConst, ZERO } from "./constants";
 import { computePi } from "./pi";
 import { simplify } from "./simplify";
 
-function rawArctanSeries(
-  absN: bigint,
-  absD: bigint,
-  precision: PrecisionOptions,
-): { n: bigint; d: bigint } {
-  // Pad decimals tightly to safely absorb accumulated final rounding artifacts
-  const precisionDigits = getPrecisionDigits(precision.maxDecimals);
-  const SCALE = 10n ** BigInt(precisionDigits);
-
-  const xScaled = (absN * SCALE) / absD;
-  if (xScaled === 0n) return { n: 0n, d: SCALE };
-
-  const xSqScaled = (xScaled * xScaled) / SCALE;
+function rawArctanSeries(xScaled: bigint, bitPrecision: bigint): bigint {
+  const xSqScaled = (xScaled * xScaled) >> bitPrecision;
 
   let currentTerm = xScaled;
   let totalSum = xScaled; // k = 0 term
+
   let k = 1n;
 
   while (true) {
-    currentTerm = (currentTerm * xSqScaled) / SCALE;
+    currentTerm = (currentTerm * xSqScaled) >> bitPrecision;
     const denominatorFactor = 2n * k + 1n;
     const termValue = currentTerm / denominatorFactor;
 
@@ -41,12 +31,14 @@ function rawArctanSeries(
     k++;
   }
 
-  return { n: totalSum, d: SCALE };
+  return totalSum;
 }
 
 function arctan(v: NormalValue, precision: PrecisionOptions): NormalValue {
   const { n, d } = v;
   if (n === 0n) return ZERO;
+
+  const bitPrecision = BigInt(getBitPrecision(precision.maxDecimals));
 
   const isNegative = n < 0n !== d < 0n;
   const absN = n < 0n ? -n : n;
@@ -95,9 +87,10 @@ function arctan(v: NormalValue, precision: PrecisionOptions): NormalValue {
   }
 
   // --- BASE CASE: Values safely between 0 and 0.5 ---
-  const r = rawArctanSeries(absN, absD, precision);
+  const xScaled = (absN << bitPrecision) / absD;
+  const r = rawArctanSeries(xScaled, bitPrecision);
 
-  return simplify({ n: isNegative ? -r.n : r.n, d: r.d });
+  return simplify({ n: isNegative ? -r : r, d: 1n << bitPrecision });
 }
 
 export { arctan };

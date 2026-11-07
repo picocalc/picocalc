@@ -8,7 +8,17 @@ import type {
 } from "./lexer";
 import { getSym } from "./symbol";
 
-const KNOWN_FUNCTIONS = new Set([
+type FnName =
+  | "abs"
+  | "arctan"
+  | "arctanh"
+  | "ceil"
+  | "exp"
+  | "floor"
+  | "ln"
+  | "sqrt";
+
+const KNOWN_FUNCTIONS = new Set<FnName>([
   "abs",
   "arctan",
   "arctanh",
@@ -17,9 +27,7 @@ const KNOWN_FUNCTIONS = new Set([
   "floor",
   "ln",
   "sqrt",
-] as const);
-type ExtractSetType<T> = T extends Set<infer U> ? U : never;
-type FnName = ExtractSetType<typeof KNOWN_FUNCTIONS>;
+]);
 
 function isKnownFunctionName(name: string): name is FnName {
   return KNOWN_FUNCTIONS.has(name as FnName);
