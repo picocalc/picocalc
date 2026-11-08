@@ -1,5 +1,5 @@
 import { getBitPrecision } from "#lib/options";
-import type { NormalValue, PrecisionOptions } from "#lib/types";
+import type { NormalValue } from "#lib/types";
 
 import { ONE, ZERO } from "./constants";
 import { computePi } from "./pi";
@@ -70,16 +70,16 @@ function rawCosSeries(rScaled: bigint, bitPrecision: bigint): bigint {
   return totalSum;
 }
 
-function getHalfPi(precision: PrecisionOptions): NormalValue {
-  const { d, n, c } = computePi(precision);
+function getHalfPi(maxDecimals?: number): NormalValue {
+  const { d, n, c } = computePi(maxDecimals);
   return { c, n, d: d * 2n };
 }
 
-function sin(v: NormalValue, precision: PrecisionOptions): NormalValue {
+function sin(v: NormalValue, maxDecimals?: number): NormalValue {
   const { n, d, c, e } = v;
   if (n === 0n) return ZERO;
 
-  const bitPrecision = BigInt(getBitPrecision(precision.maxDecimals));
+  const bitPrecision = getBitPrecision(maxDecimals);
   const scale = 1n << bitPrecision;
 
   const isPiLinear = c === "pi" && (e === undefined || e.n === 1n);
@@ -96,11 +96,11 @@ function sin(v: NormalValue, precision: PrecisionOptions): NormalValue {
       if (quadrant === 1n) return ONE;
       return { n: -1n, d: 1n };
     }
-    const piVal = computePi(precision);
+    const piVal = computePi(maxDecimals);
     rScaled = (rN * piVal.n * scale) / (2n * d * piVal.d);
   } else {
     const simple = toSimpleFraction(v);
-    const halfPi = getHalfPi(precision);
+    const halfPi = getHalfPi(maxDecimals);
 
     const divNum = simple.n * halfPi.d;
     const divDen = simple.d * halfPi.n;
@@ -136,11 +136,11 @@ function sin(v: NormalValue, precision: PrecisionOptions): NormalValue {
   return { n: finalN, d: scale };
 }
 
-function cos(v: NormalValue, precision: PrecisionOptions): NormalValue {
+function cos(v: NormalValue, maxDecimals?: number): NormalValue {
   const { n, d, c, e } = v;
   if (n === 0n) return ONE;
 
-  const bitPrecision = BigInt(getBitPrecision(precision.maxDecimals));
+  const bitPrecision = getBitPrecision(maxDecimals);
   const scale = 1n << bitPrecision;
 
   const isPiLinear = c === "pi" && (e === undefined || e.n === 1n);
@@ -158,11 +158,11 @@ function cos(v: NormalValue, precision: PrecisionOptions): NormalValue {
       }
       return ZERO;
     }
-    const piVal = computePi(precision);
+    const piVal = computePi(maxDecimals);
     rScaled = (rN * piVal.n * scale) / (2n * d * piVal.d);
   } else {
     const simple = toSimpleFraction(v);
-    const halfPi = getHalfPi(precision);
+    const halfPi = getHalfPi(maxDecimals);
 
     const divNum = simple.n * halfPi.d;
     const divDen = simple.d * halfPi.n;

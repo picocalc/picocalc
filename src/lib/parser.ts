@@ -149,12 +149,12 @@ export function parse(tokens: Token[]): ParsedToken[] {
 
     if (token.type === "IDENTIFIER") token = resolveIdentifier(token);
 
-    const pos = token.pos;
+    const { pos, type } = token;
 
     const isPrevOperand = isOperand(result.at(-1));
 
     // --- Handle Pipes ---
-    if (token.type === "PIPE") {
+    if (type === "PIPE") {
       const isClosing = absStack > 0 && isPrevOperand;
       if (isClosing) {
         result.push({ type: "ABS_CLOSE", pos });
@@ -170,10 +170,10 @@ export function parse(tokens: Token[]): ParsedToken[] {
     }
 
     const needsImplicit =
-      token.type === "LPAREN" ||
-      token.type === "FUNC" ||
-      token.type === "NUMBER" ||
-      token.type === "CONST";
+      type === "LPAREN" ||
+      type === "FUNC" ||
+      type === "NUMBER" ||
+      type === "CONST";
 
     if (needsImplicit && isPrevOperand) {
       result.push({ type: "IMPLICIT_MUL", pos });
@@ -190,7 +190,7 @@ export function parse(tokens: Token[]): ParsedToken[] {
     }
 
     if (
-      (token.type === "FACTORIAL" || token.type === "RPAREN") &&
+      (type === "FACTORIAL" || type === "RPAREN") &&
       isUnaryContext(prevParsed)
     ) {
       if (!prevParsed) {
@@ -210,18 +210,15 @@ export function parse(tokens: Token[]): ParsedToken[] {
       (prev.type === "NUMBER" ||
         (prev.type === "IDENTIFIER" &&
           resolveIdentifier(prev).type === "CONST")) &&
-      token.type === "NUMBER"
+      type === "NUMBER"
     ) {
       throw new ParserError("Missing operator between numbers", token.pos);
     }
 
     // --- Unary Identification ---
-    if (
-      (token.type === "PLUS" || token.type === "MINUS") &&
-      isUnaryContext(prevParsed)
-    ) {
+    if ((type === "PLUS" || type === "MINUS") && isUnaryContext(prevParsed)) {
       result.push({
-        type: token.type === "PLUS" ? "UNARY_PLUS" : "UNARY_MINUS",
+        type: type === "PLUS" ? "UNARY_PLUS" : "UNARY_MINUS",
         pos,
       });
     } else {

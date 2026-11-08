@@ -1,5 +1,4 @@
 import {
-  MismatchedParenthesisError,
   EmptyExpressionError,
   MaximumPrecisionError,
   OverflowError,
@@ -18,8 +17,7 @@ import { arctan } from "./utils/arctan";
 import { arctanh } from "./utils/arctanh";
 import { ceil } from "./utils/ceil";
 import { divide } from "./utils/divide";
-import { exp } from "./utils/exp";
-import { exponentiate } from "./utils/exponentiate";
+import { exp, exponentiate } from "./utils/exp";
 import { factorial } from "./utils/factorial";
 import { floor } from "./utils/floor";
 import { ln } from "./utils/ln";
@@ -102,7 +100,7 @@ export function evaluate(
       const { id } = op;
 
       if (id === "sqrt") {
-        values.push(sqrt(right, options));
+        values.push(sqrt(right, maxDecimals));
         return;
       }
 
@@ -130,27 +128,31 @@ export function evaluate(
           return;
         }
         case "arctan": {
-          values.push(arctan(toSimpleFraction(right, maxDecimals), options));
+          values.push(
+            arctan(toSimpleFraction(right, maxDecimals), maxDecimals),
+          );
           return;
         }
         case "arctanh": {
-          values.push(arctanh(toSimpleFraction(right, maxDecimals), options));
+          values.push(
+            arctanh(toSimpleFraction(right, maxDecimals), maxDecimals),
+          );
           return;
         }
         case "ln": {
-          values.push(ln(right, options));
+          values.push(ln(right, maxDecimals));
           return;
         }
         case "exp": {
-          values.push(exp(right, options));
+          values.push(exp(right, maxDecimals));
           return;
         }
         case "sin": {
-          values.push(sin(right, options));
+          values.push(sin(right, maxDecimals));
           return;
         }
         case "cos": {
-          values.push(cos(right, options));
+          values.push(cos(right, maxDecimals));
           return;
         }
       }
@@ -204,7 +206,7 @@ export function evaluate(
         return;
       }
       case "EXP": {
-        values.push(exponentiate(left, right, options));
+        values.push(exponentiate(left, right, maxDecimals));
         return;
       }
     }
@@ -275,15 +277,12 @@ export function evaluate(
         break;
       }
       case "RPAREN": {
-        let foundMatch = false;
         while (ops.length > 0) {
           if (ops.at(-1) === "LPAREN") {
-            foundMatch = true;
             break;
           }
           applyOp(token.pos);
         }
-        if (!foundMatch) throw new MismatchedParenthesisError(token.pos);
         ops.pop();
         const nextOp = ops.at(-1);
         if (!nextOp) break;

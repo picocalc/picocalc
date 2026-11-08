@@ -1,6 +1,6 @@
 import { InterpreterRangeError } from "#lib/errors";
 import { getBitPrecision } from "#lib/options";
-import type { NormalValue, PrecisionOptions } from "#lib/types";
+import type { NormalValue } from "#lib/types";
 
 import { ZERO } from "./constants";
 
@@ -25,11 +25,11 @@ function rawArctanhSeries(xScaled: bigint, bitPrecision: bigint) {
   return totalSum;
 }
 
-function arctanh(v: NormalValue, precision: PrecisionOptions): NormalValue {
+function arctanh(v: NormalValue, maxDecimals?: number): NormalValue {
   const { n, d } = v;
   if (n === 0n) return ZERO;
 
-  const bitPrecision = BigInt(getBitPrecision(precision.maxDecimals));
+  const bitPrecision = getBitPrecision(maxDecimals);
 
   const isNegative = n < 0n !== d < 0n;
 

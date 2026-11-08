@@ -1,4 +1,3 @@
-import { MAX_DECIMALS } from "#lib/options";
 import type { NormalValue, Value } from "#lib/types";
 
 import { ZERO } from "./constants";
@@ -14,7 +13,7 @@ export function negate<V extends Value>(v: V): V {
 export function add<V extends Value>(
   left: V,
   right: V,
-  maxDecimals: number = MAX_DECIMALS,
+  maxDecimals?: number,
   subtract: boolean = false,
 ): V | NormalValue {
   const lN = left.n;

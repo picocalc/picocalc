@@ -5,7 +5,6 @@ import {
   EmptyExpressionError,
   InterpreterRangeError,
   MaximumPrecisionError,
-  MismatchedParenthesisError,
   OverflowError,
 } from "#lib/errors";
 import { calculate } from "#src";
@@ -170,8 +169,9 @@ describe("evaluate", () => {
     expect(calculate("(1+2)(3+4)")).toBe("21");
   });
 
-  it("should allow missing closing parenthesis", () => {
+  it("should allow missing open and closing parenthesis", () => {
     expect(calculate("(1 + 2")).toBe("3");
+    expect(calculate("1 + 2)")).toBe("3");
   });
 
   it("should throw DivisionByZeroError for division by 0", () => {
@@ -260,11 +260,14 @@ describe("evaluate", () => {
   });
 
   function expectWithRoundtrip(expression: string, expected: string) {
-    expect(calculate(expression)).toBe(expected);
+    expect(
+      calculate(expression),
+      `Failed to evaluate '${expression}' correctly`,
+    ).toBe(expected);
 
     expect(
       calculate(calculate(expression, { format: "precise" })),
-      `Should correctly roundtrip via precise mode for ${expression}`,
+      `Failed to roundtrip via precise mode for '${expression}' correctly`,
     ).toBe(expected);
   }
 
@@ -523,8 +526,11 @@ describe("evaluate", () => {
     expect(calculate("ln(1)")).toBe("0");
     expect(calculate("ln(e)")).toBe("1");
     expect(calculate("ln(2)", { maxDecimals: 100 })).toBe(LN_2_TO_100_DECIMALS);
-    expect(calculate("1e25 (1-ln(e))", { format: "precise" })).toBe("0");
-    expect(calculate("1e25 (1-ln(e))")).toBe("0");
+
+    expectWithRoundtrip("1e50 (1-ln(e))", "0");
+    expectWithRoundtrip("1e50 (0.5-ln(e^0.5))", "0");
+    expectWithRoundtrip("1e50 (0.25-ln(e^0.25))", "0");
+
     expect(calculate("ln(1e100)", { maxDecimals: 200 })).toBe(
       "230.25850929940456840179914546843642076011014886287729760333279009675726096773524802359972050895982983419677840422862486334095254650828067566662873690987816894829072083255546808437998948262331985283935053",
     );
@@ -570,6 +576,7 @@ describe("evaluate", () => {
       expect(calculate("sin(e)", { maxDecimals: 40 })).toBe(
         "0.4107812905029086954760094920183605918883",
       );
+      expect(calculate("sin(.1pi)")).toBe("0.309016994374947424102293417183");
     }, 200);
 
     it("should handle cos function", () => {
@@ -595,6 +602,7 @@ describe("evaluate", () => {
       expect(calculate("cos(e)", { maxDecimals: 40 })).toBe(
         "-0.9117339147869650978937173178054318452504",
       );
+      expect(calculate("cos(.1pi)")).toBe("0.951056516295153572116439333379");
     }, 200);
   });
 
@@ -685,6 +693,10 @@ describe("evaluate", () => {
     expect(calculate("(-32) ^ 0.2")).toBe("-2");
     expect(calculate("(-343) ^ (1/3)")).toBe("-7");
     expect(calculate("(-216) ^ (4/3)")).toBe("1296");
+    expect(calculate("(-1e-101) ^ (1/101)")).toBe("-0.1");
+    expect(calculate("(1+1e-14)^1e14")).toBe(
+      "2.718281828459031643951145176251",
+    );
   });
 
   it("should handle implicit multiplication with pipe operator", () => {
@@ -754,6 +766,8 @@ describe("evaluate", () => {
     expect(calculate("pi^(5/2)", { format: "precise" })).toBe("pi^(5/2)");
     expect(calculate("pi^(3/2)", { format: "precise" })).toBe("pi^(3/2)");
     expect(calculate("pi^(3/4)", { format: "precise" })).toBe("pi^(3/4)");
+    expect(calculate("pi^(1/1000)", { format: "precise" })).toBe("pi^(1/1000)");
+    expect(calculate("exp(1/1000)", { format: "precise" })).toBe("e^(1/1000)");
     expect(calculate("sqrt(pi)", { format: "precise" })).toBe("sqrt(pi)");
     expect(calculate("sqrt(pi) * sqrt(pi)", { format: "precise" })).toBe("pi");
     expect(calculate("sqrt(pi) * pi", { format: "precise" })).toBe("pi^(3/2)");
@@ -914,10 +928,12 @@ describe("evaluate", () => {
     expect(calculate("(-1)^(2/3)")).toBe("1");
     expect(calculate("(-1)^.4")).toBe("1");
     expect(calculate("(-1)^(1/3)")).toBe("-1");
+    expect(calculate("(-1)^(1/101)")).toBe("-1");
     expect(calculate("(-1)^.2")).toBe("-1");
 
     expect(safe(() => calculate("(-1)^0.5"))).not.toBe("-1");
     expect(safe(() => calculate("(-1)^(1/2)"))).not.toBe("-1");
+    expect(safe(() => calculate("(-1)^(1/100)"))).not.toBe("-1");
     expect(safe(() => calculate("(-1)^(3/4)"))).not.toBe("-1");
   });
 
@@ -959,10 +975,6 @@ describe("evaluate", () => {
 });
 
 describe("evaluate - error handling", () => {
-  it("should throw MismatchedParenthesisError for extra closing parenthesis", () => {
-    expect(() => calculate("1 + 2)")).toThrow(MismatchedParenthesisError);
-  });
-
   it("should throw EmptyExpressionError for empty expression", () => {
     expect(() => calculate("")).toThrow(EmptyExpressionError);
     expect(() => calculate(" ")).toThrow(EmptyExpressionError);

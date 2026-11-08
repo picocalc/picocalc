@@ -1,5 +1,4 @@
 import { DivisionByZeroError } from "#lib/errors";
-import { MAX_DECIMALS } from "#lib/options";
 import type { NormalValue } from "#lib/types";
 
 import { getConst, ZERO } from "./constants";
@@ -28,13 +27,10 @@ function simplify(v: NormalValue): NormalValue {
 /**
  * Resolves any constants and exponents to return a simple fraction.
  */
-function toSimpleFraction(
-  val: NormalValue,
-  maxDecimals: number = MAX_DECIMALS,
-): NormalValue {
+function toSimpleFraction(val: NormalValue, maxDecimals?: number): NormalValue {
   if (!val.c) return { d: val.d, n: val.n };
 
-  const c = getConst(val.c, { maxDecimals });
+  const c = getConst(val.c, maxDecimals);
   const expN = val.e?.n ?? 1n;
   const expD = val.e?.d ?? 1n;
 
@@ -46,7 +42,7 @@ function toSimpleFraction(
   };
 
   if (expD !== 1n) {
-    poweredConstant = nthRoot(poweredConstant, expD, { format: "precise" });
+    poweredConstant = nthRoot(poweredConstant, expD);
   }
 
   return multiply(poweredConstant, { n: val.n, d: val.d }, maxDecimals);
