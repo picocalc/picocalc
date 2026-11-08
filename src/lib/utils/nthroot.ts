@@ -60,24 +60,18 @@ export function nthRoot(
 
   if (v.n === 0n) return ZERO;
 
-  // 1. Try for an exact integer root if 'precise' is requested
-  if (precision.format === "precise") {
-    const rootN = iNthRoot(v.n, n);
-    const rootD = iNthRoot(v.d, n);
-    if (rootN ** n === v.n && rootD ** n === v.d) {
-      const e = simplify({ n: v.e?.n ?? 1n, d: (v.e?.d ?? 1n) * n });
-      return simplify({ n: rootN, d: rootD, c: v.c, e });
-    }
+  const rootN = iNthRoot(v.n, n);
+  const rootD = iNthRoot(v.d, n);
+  if (rootN ** n === v.n && rootD ** n === v.d) {
+    const e = simplify({ n: v.e?.n ?? 1n, d: (v.e?.d ?? 1n) * n });
+    return simplify({ n: rootN, d: rootD, c: v.c, e });
   }
 
   const precisionDigits = getPrecisionDigits(precision.maxDecimals);
 
-  // 2. Fallback to high-precision approximation
-  // To get 'p' digits of precision, we multiply the numerator by 10^(root * p)
   const scalePower = BigInt(precisionDigits) * n;
   const scaleFactor = 10n ** scalePower;
 
-  // Bring the fraction into a single BigInt space: (n/d) * 10^(root * p)
   const s = toSimpleFraction(v);
   const scaledValue = (s.n * scaleFactor) / s.d;
 

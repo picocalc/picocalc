@@ -51,26 +51,19 @@ export function sqrt<V extends Value>(
 
   if (v.n === 0n) return ZERO;
 
-  if (precision.format === "precise") {
-    const [nIsSquare, n] = isPerfectSquare(v.n);
-    const [dIsSquare, d] = isPerfectSquare(v.d);
+  const [nIsSquare, n] = isPerfectSquare(v.n);
+  const [dIsSquare, d] = isPerfectSquare(v.d);
 
-    if (nIsSquare && dIsSquare) {
-      const e = simplify({ n: v.e?.n ?? 1n, d: (v.e?.d ?? 1n) * 2n });
-      return simplify({ n, d, c: v.c, e });
-    }
+  if (nIsSquare && dIsSquare) {
+    const e = simplify({ n: v.e?.n ?? 1n, d: (v.e?.d ?? 1n) * 2n });
+    return simplify({ n, d, c: v.c, e });
   }
 
   const precisionDigits = getPrecisionDigits(precision.maxDecimals);
 
-  // To get 'p' digits of precision in a fraction, we multiply the
-  // numerator by 10^(2*p) before taking the integer sqrt.
   const scaleFactor = 10n ** BigInt(precisionDigits * 2);
   const s = toSimpleFraction(v);
   const scaledNumerator = (s.n * scaleFactor) / s.d;
 
-  const n = isqrt(scaledNumerator);
-  const d = 10n ** BigInt(precisionDigits);
-
-  return { n, d };
+  return { n: isqrt(scaledNumerator), d: 10n ** BigInt(precisionDigits) };
 }

@@ -260,11 +260,14 @@ describe("evaluate", () => {
   });
 
   function expectWithRoundtrip(expression: string, expected: string) {
-    expect(calculate(expression)).toBe(expected);
+    expect(
+      calculate(expression),
+      `Failed to evaluate '${expression}' correctly`,
+    ).toBe(expected);
 
     expect(
       calculate(calculate(expression, { format: "precise" })),
-      `Should correctly roundtrip via precise mode for ${expression}`,
+      `Failed to roundtrip via precise mode for '${expression}' correctly`,
     ).toBe(expected);
   }
 
@@ -523,8 +526,11 @@ describe("evaluate", () => {
     expect(calculate("ln(1)")).toBe("0");
     expect(calculate("ln(e)")).toBe("1");
     expect(calculate("ln(2)", { maxDecimals: 100 })).toBe(LN_2_TO_100_DECIMALS);
-    expect(calculate("1e25 (1-ln(e))", { format: "precise" })).toBe("0");
-    expect(calculate("1e25 (1-ln(e))")).toBe("0");
+
+    expectWithRoundtrip("1e50 (1-ln(e))", "0");
+    expectWithRoundtrip("1e50 (0.5-ln(e^0.5))", "0");
+    expectWithRoundtrip("1e50 (0.25-ln(e^0.25))", "0");
+
     expect(calculate("ln(1e100)", { maxDecimals: 200 })).toBe(
       "230.25850929940456840179914546843642076011014886287729760333279009675726096773524802359972050895982983419677840422862486334095254650828067566662873690987816894829072083255546808437998948262331985283935053",
     );
