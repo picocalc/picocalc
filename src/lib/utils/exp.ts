@@ -107,7 +107,7 @@ function exponentiate(left: Value, right: Value, maxDecimals?: number): Value {
     return ZERO;
   }
 
-  if (dExp >= 100 && (lN !== 1n || rS.c)) {
+  if ((dExp >= 100 || lD > 1000) && (lN !== 1n || rS.c)) {
     const isNegativeBase = lN < 0;
 
     if (isNegativeBase && dExp % 2n === 0n) {
@@ -124,9 +124,15 @@ function exponentiate(left: Value, right: Value, maxDecimals?: number): Value {
     const scale = 1n << getBitPrecision(maxDecimals);
     const lnBaseScaled = (lnBase.n * scale) / lnBase.d;
     const rightScaled = (r.n * scale) / r.d;
-    const productScaled = (lnBaseScaled * rightScaled) / scale;
-
-    const productVal = { n: productScaled, d: scale };
+    const p = (lnBaseScaled * rightScaled) / scale;
+    const pAbs = p < 0 ? -p : p;
+    if (
+      scale > pAbs * MAX_EXPONENT_RESULT_DIGITS ||
+      pAbs > scale * MAX_EXPONENT_RESULT_DIGITS
+    ) {
+      return OverflowValue;
+    }
+    const productVal = { n: p, d: scale };
     const result = rawExp(productVal, maxDecimals);
 
     if (isNegativeBase && normalizedExp.n % 2n !== 0n) {

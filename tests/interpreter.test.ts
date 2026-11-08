@@ -694,6 +694,9 @@ describe("evaluate", () => {
     expect(calculate("(-343) ^ (1/3)")).toBe("-7");
     expect(calculate("(-216) ^ (4/3)")).toBe("1296");
     expect(calculate("(-1e-101) ^ (1/101)")).toBe("-0.1");
+    expect(calculate("(1+1e-14)^1e14")).toBe(
+      "2.718281828459031643951145176251",
+    );
   });
 
   it("should handle implicit multiplication with pipe operator", () => {
