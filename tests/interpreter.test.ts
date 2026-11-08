@@ -576,6 +576,7 @@ describe("evaluate", () => {
       expect(calculate("sin(e)", { maxDecimals: 40 })).toBe(
         "0.4107812905029086954760094920183605918883",
       );
+      expect(calculate("sin(.1pi)")).toBe("0.309016994374947424102293417183");
     }, 200);
 
     it("should handle cos function", () => {
@@ -601,6 +602,7 @@ describe("evaluate", () => {
       expect(calculate("cos(e)", { maxDecimals: 40 })).toBe(
         "-0.9117339147869650978937173178054318452504",
       );
+      expect(calculate("cos(.1pi)")).toBe("0.951056516295153572116439333379");
     }, 200);
   });
 
@@ -691,6 +693,7 @@ describe("evaluate", () => {
     expect(calculate("(-32) ^ 0.2")).toBe("-2");
     expect(calculate("(-343) ^ (1/3)")).toBe("-7");
     expect(calculate("(-216) ^ (4/3)")).toBe("1296");
+    expect(calculate("(-1e-101) ^ (1/101)")).toBe("-0.1");
   });
 
   it("should handle implicit multiplication with pipe operator", () => {
@@ -922,10 +925,12 @@ describe("evaluate", () => {
     expect(calculate("(-1)^(2/3)")).toBe("1");
     expect(calculate("(-1)^.4")).toBe("1");
     expect(calculate("(-1)^(1/3)")).toBe("-1");
+    expect(calculate("(-1)^(1/101)")).toBe("-1");
     expect(calculate("(-1)^.2")).toBe("-1");
 
     expect(safe(() => calculate("(-1)^0.5"))).not.toBe("-1");
     expect(safe(() => calculate("(-1)^(1/2)"))).not.toBe("-1");
+    expect(safe(() => calculate("(-1)^(1/100)"))).not.toBe("-1");
     expect(safe(() => calculate("(-1)^(3/4)"))).not.toBe("-1");
   });
 
