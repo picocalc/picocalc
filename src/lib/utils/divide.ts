@@ -4,7 +4,7 @@ import { OverflowValue } from "#lib/types";
 import type { Value, ValueExponent } from "#lib/types";
 
 import { add } from "./add";
-import { ZERO } from "./constants";
+import { ONE, ZERO } from "./constants";
 import { gcd } from "./gcd";
 import { simplify, toSimpleFraction } from "./simplify";
 
@@ -52,7 +52,7 @@ export function divide(
 
   let e: ValueExponent | undefined;
   if (lC !== undefined) {
-    e = lE ? { n: lE.n, d: lE.d ?? 1n } : { n: 1n, d: 1n };
+    e = lE ? { n: lE.n, d: lE.d ?? 1n } : ONE;
   } else if (rC !== undefined) {
     e = { n: -(rE?.n ?? 1n), d: rE?.d ?? 1n };
   }
