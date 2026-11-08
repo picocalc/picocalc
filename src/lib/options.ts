@@ -27,6 +27,11 @@ const MAX_FACTORIAL = 20_000;
  */
 const MAX_SCIENTIFIC_NUMBER_EXPONENT = 3e5;
 
+/**
+ * Maximum digits allowed for the result of exponentiation
+ */
+const MAX_EXPONENT_RESULT_DIGITS = 10_000_000n;
+
 export {
   MAX_DECIMALS,
   ROUNDING_MODE,
@@ -35,4 +40,5 @@ export {
   MAX_FACTORIAL,
   MAX_PRECISION,
   MAX_SCIENTIFIC_NUMBER_EXPONENT,
+  MAX_EXPONENT_RESULT_DIGITS,
 };
