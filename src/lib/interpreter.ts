@@ -70,7 +70,7 @@ function isUnaryOperation(op: StackOp) {
 }
 
 function getOpPrecedence(op: StackOp): number {
-  if (typeof op === "object") {
+  if (isFunctionOp(op)) {
     return precedence.FN_CALL;
   }
   return precedence[op];

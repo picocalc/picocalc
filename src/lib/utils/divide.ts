@@ -6,7 +6,7 @@ import type { Value, ValueExponent } from "#lib/types";
 import { add } from "./add";
 import { ZERO } from "./constants";
 import { gcd } from "./gcd";
-import { simplify } from "./simplify";
+import { simplify, toSimpleFraction } from "./simplify";
 
 export function divide(
   left: Value,
@@ -22,6 +22,14 @@ export function divide(
 
   const { d: lD, c: lC, e: lE } = left;
   const { d: rD, c: rC, e: rE } = right;
+
+  if (lC !== undefined && rC !== undefined && lC !== rC) {
+    return divide(
+      toSimpleFraction(left, maxDecimals),
+      toSimpleFraction(right, maxDecimals),
+      maxDecimals,
+    );
+  }
 
   const g1 = gcd(lN, rN);
   const g2 = gcd(rD, lD);

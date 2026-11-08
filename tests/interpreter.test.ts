@@ -259,30 +259,44 @@ describe("evaluate", () => {
     expect(calculate("sqrt(2) * sqrt(2)")).toBe("2");
   });
 
-  function expectToPreserveCorrectness(expression: string) {
+  function expectWithRoundtrip(expression: string, expected: string) {
+    expect(calculate(expression)).toBe(expected);
+
     expect(
       calculate(calculate(expression, { format: "precise" })),
-      `Should preserve correctness for ${expression}`,
-    ).toBe(calculate(expression));
+      `Should correctly roundtrip via precise mode for ${expression}`,
+    ).toBe(expected);
   }
 
-  it("should correctly add 2 constants in precise mode", () => {
-    expectToPreserveCorrectness("e + pi");
-    expectToPreserveCorrectness("e + 1");
-    expectToPreserveCorrectness("1 + pi");
-    expectToPreserveCorrectness("e^2 + pi");
-    expectToPreserveCorrectness("e + pi^2");
-    expectToPreserveCorrectness("e^2 + pi^2");
-    expectToPreserveCorrectness("e + e^2");
-    expectToPreserveCorrectness("pi^2 + pi");
-  });
+  it("should correctly handle operations with 2 different constants", () => {
+    expectWithRoundtrip("e + 1", "3.718281828459045235360287471353");
+    expectWithRoundtrip("1 + pi", "4.14159265358979323846264338328");
 
-  it("should correctly multiply 2 constants in precise mode", () => {
-    expectToPreserveCorrectness("e * pi");
-  });
+    expectWithRoundtrip("e + e^2", "10.107337927389695462590714931928");
+    expectWithRoundtrip("pi^2 +pi", "13.011197054679151857297134383156");
 
-  it("should correctly exponentiate 2 constants in precise mode", () => {
-    expectToPreserveCorrectness("e ^ pi");
+    expectWithRoundtrip("e + pi", "5.859874482048838473822930854632");
+    expectWithRoundtrip("pi + e", "5.859874482048838473822930854632");
+
+    expectWithRoundtrip("e - pi", "-0.423310825130748003102355911927");
+    expectWithRoundtrip("pi - e", "0.423310825130748003102355911927");
+
+    expectWithRoundtrip("e^2 + pi", "10.530648752520443465693070843855");
+    expectWithRoundtrip("e + pi^2", "12.587886229548403854194778471229");
+
+    expectWithRoundtrip("e^2 + pi^2", "17.258660500020008846064918460451");
+
+    expectWithRoundtrip("e * pi", "8.539734222673567065463550869547");
+    expectWithRoundtrip("pi * e", "8.539734222673567065463550869547");
+
+    expectWithRoundtrip("e / pi", "0.865255979432265087217774789646");
+    expectWithRoundtrip("pi / e", "1.155727349790921717910093183313");
+
+    expectWithRoundtrip("e ^ pi", "23.140692632779269005729086367949");
+    expectWithRoundtrip("pi ^ e", "22.459157718361045473427152204544");
+
+    expectWithRoundtrip("e % pi", "2.718281828459045235360287471353");
+    expectWithRoundtrip("pi % e", "0.423310825130748003102355911927");
   });
 
   it("should correctly multiply a whole number with a decimal", () => {
@@ -382,20 +396,12 @@ describe("evaluate", () => {
     expect(calculate("2.5 % 2")).toBe("0.5");
     expect(safe(() => calculate("pi % 2"))).not.toBeOneOf(["0", "1"]);
     expect(safe(() => calculate("e % 2"))).not.toBeOneOf(["0", "1"]);
-    expect(safe(() => calculate("pi % e"))).not.toBeOneOf(["0", "1"]);
-    expect(safe(() => calculate("e % pi"))).not.toBeOneOf(["0", "1"]);
     expect(
       safe(() => calculate("pi % 2", { format: "precise" })),
     ).not.toBeOneOf(["0", "1"]);
     expect(safe(() => calculate("e % 2", { format: "precise" }))).not.toBeOneOf(
       ["0", "1"],
     );
-    expect(
-      safe(() => calculate("pi % e", { format: "precise" })),
-    ).not.toBeOneOf(["0", "1"]);
-    expect(
-      safe(() => calculate("e % pi", { format: "precise" })),
-    ).not.toBeOneOf(["0", "1"]);
   });
 
   it("should throw DivisionByZeroError for remainder division by 0", () => {

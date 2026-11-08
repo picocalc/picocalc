@@ -26,6 +26,15 @@ export function add<V extends Value>(
   const { d: lD, c, e } = left;
   const { d: rD, c: rC, e: rE } = right;
 
+  if (c !== rC || e?.n !== rE?.n) {
+    return add(
+      toSimpleFraction(left, maxDecimals),
+      toSimpleFraction(right, maxDecimals),
+      maxDecimals,
+      subtract,
+    );
+  }
+
   let n: bigint, d: bigint;
 
   if (lD === rD) {
@@ -39,20 +48,12 @@ export function add<V extends Value>(
     d = lD * mLeft;
   }
 
+  if (n === 0n) return ZERO;
+
   if (n < 0n && d < 0n) {
     n = -n;
     d = -d;
   }
 
-  if (n === 0n) return ZERO;
-
-  if (c !== rC || e?.n !== rE?.n) {
-    return add(
-      toSimpleFraction(left, maxDecimals),
-      toSimpleFraction(right, maxDecimals),
-      maxDecimals,
-      subtract,
-    );
-  }
   return { n, d, c, e };
 }
