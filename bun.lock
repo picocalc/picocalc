@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "math-parser",
+      "name": "picocalc",
       "dependencies": {
         "bigint.bitlength": "0.2.0",
       },
