@@ -1,4 +1,3 @@
-import { MAX_DECIMALS } from "#lib/options";
 import type { NormalValue, Value } from "#lib/types";
 
 import { add } from "./add";
@@ -9,7 +8,7 @@ import { simplify, toSimpleFraction } from "./simplify";
 export function multiply<V extends Value>(
   a: V,
   b: V,
-  maxDecimals: number = MAX_DECIMALS,
+  maxDecimals?: number,
 ): V | NormalValue {
   const aN = a.n;
   const bN = b.n;

@@ -1,6 +1,6 @@
 import { NotImplementedError } from "#lib/errors";
-import { getPrecisionDigits } from "#lib/options";
-import type { NormalValue, PrecisionOptions, Value } from "#lib/types";
+import { getBitPrecision } from "#lib/options";
+import type { NormalValue, Value } from "#lib/types";
 
 import { ZERO } from "./constants";
 import { simplify, toSimpleFraction } from "./simplify";
@@ -39,7 +39,7 @@ function isPerfectSquare(val: bigint): [boolean, bigint] {
 
 export function sqrt<V extends Value>(
   v: V,
-  precision: PrecisionOptions,
+  maxDecimals?: number,
 ): V | NormalValue {
   if (v.n === "OVERFLOW") return v;
 
@@ -59,11 +59,11 @@ export function sqrt<V extends Value>(
     return simplify({ n, d, c: v.c, e });
   }
 
-  const precisionDigits = getPrecisionDigits(precision.maxDecimals);
+  const precisionBits = getBitPrecision(maxDecimals);
 
-  const scaleFactor = 10n ** BigInt(precisionDigits * 2);
+  const scaleFactor = 1n << (precisionBits * 2n);
   const s = toSimpleFraction(v);
   const scaledNumerator = (s.n * scaleFactor) / s.d;
 
-  return { n: isqrt(scaledNumerator), d: 10n ** BigInt(precisionDigits) };
+  return { n: isqrt(scaledNumerator), d: 1n << precisionBits };
 }

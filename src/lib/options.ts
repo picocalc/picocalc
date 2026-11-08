@@ -4,12 +4,8 @@ const MAX_DECIMALS = 30;
 
 const ROUNDING_MODE: RoundingMode = "round";
 
-function getPrecisionDigits(maxDecimals: number = 30): number {
-  return maxDecimals + 10;
-}
-
-function getBitPrecision(maxDecimals: number = 30): number {
-  return maxDecimals * 4 + 32;
+function getBitPrecision(maxDecimals: number = MAX_DECIMALS): bigint {
+  return BigInt(maxDecimals * 4 + 32);
 }
 
 /**
@@ -36,7 +32,6 @@ export {
   MAX_DECIMALS,
   ROUNDING_MODE,
   getBitPrecision,
-  getPrecisionDigits,
   MAX_FACTORIAL,
   MAX_PRECISION,
   MAX_SCIENTIFIC_NUMBER_EXPONENT,

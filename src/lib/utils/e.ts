@@ -1,4 +1,4 @@
-import { getPrecisionDigits } from "#lib/options";
+import { getBitPrecision } from "#lib/options";
 import type { SimpleFraction } from "#lib/types";
 
 function splitSeries(a: bigint, b: bigint): SimpleFraction {
@@ -17,7 +17,7 @@ function splitSeries(a: bigint, b: bigint): SimpleFraction {
 function computeE(maxDecimals?: number): SimpleFraction {
   let b = 1n;
   let m = 1n;
-  const t = 10n ** BigInt(getPrecisionDigits(maxDecimals));
+  const t = 1n << getBitPrecision(maxDecimals);
 
   while (m < t) {
     b++;

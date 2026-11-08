@@ -1,7 +1,7 @@
 import { getBitPrecision } from "#lib/options";
-import type { NormalValue, PrecisionOptions } from "#lib/types";
+import type { NormalValue } from "#lib/types";
 
-import { getConst, ZERO } from "./constants";
+import { ZERO } from "./constants";
 import { computePi } from "./pi";
 import { simplify } from "./simplify";
 
@@ -34,28 +34,26 @@ function rawArctanSeries(xScaled: bigint, bitPrecision: bigint): bigint {
   return totalSum;
 }
 
-function arctan(v: NormalValue, precision: PrecisionOptions): NormalValue {
+function arctan(v: NormalValue, maxDecimals?: number): NormalValue {
   const { n, d } = v;
   if (n === 0n) return ZERO;
 
-  const bitPrecision = BigInt(getBitPrecision(precision.maxDecimals));
+  const bitPrecision = getBitPrecision(maxDecimals);
 
   const isNegative = n < 0n !== d < 0n;
   const absN = n < 0n ? -n : n;
   const absD = d < 0n ? -d : d;
 
   if (absN === absD) {
-    const pi = getConst("pi", precision);
-    const n = isNegative ? -pi.n : pi.n;
-    return simplify({ c: pi.c, n, d: pi.d * 4n });
+    return { c: "pi", n: isNegative ? -1n : 1n, d: 4n };
   }
 
   // --- IDENTITY 1: Handle Values Bigger Than 1 (Reflection) ---
   // arctan(x) = pi/2 - arctan(1/x)
   if (absN > absD) {
-    const pi = computePi(precision);
+    const pi = computePi(maxDecimals);
     // Reciprocal input is 1/x -> invert numerator and denominator
-    const subArctan = arctan({ n: absD, d: absN }, precision);
+    const subArctan = arctan({ n: absD, d: absN }, maxDecimals);
 
     // Compute: (pi.n * subArctan.d * 2) - (subArctan.n * pi.d * 2) / (2 * pi.d * subArctan.d)
     const resultNum = pi.n * subArctan.d - 2n * subArctan.n * pi.d;
@@ -69,13 +67,13 @@ function arctan(v: NormalValue, precision: PrecisionOptions): NormalValue {
   // If x > 0.5, the raw Taylor series slows down drastically. We split it using:
   // arctan(x) = arctan(1/2) + arctan((2x - 1) / (2 + x))
   if (absN * 2n > absD) {
-    const halfArctan = arctan({ n: 1n, d: 2n }, precision);
+    const halfArctan = arctan({ n: 1n, d: 2n }, maxDecimals);
 
     // For x = absN/absD, the remaining argument formula simplifies cleanly to:
     // (2*absN - absD) / (2*absD + absN)
     const remN = 2n * absN - absD;
     const remD = 2n * absD + absN;
-    const remainderArctan = arctan({ n: remN, d: remD }, precision);
+    const remainderArctan = arctan({ n: remN, d: remD }, maxDecimals);
 
     // Combine values: halfArctan + remainderArctan
     const resultNum =

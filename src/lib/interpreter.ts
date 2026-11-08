@@ -100,7 +100,7 @@ export function evaluate(
       const { id } = op;
 
       if (id === "sqrt") {
-        values.push(sqrt(right, options));
+        values.push(sqrt(right, maxDecimals));
         return;
       }
 
@@ -128,27 +128,31 @@ export function evaluate(
           return;
         }
         case "arctan": {
-          values.push(arctan(toSimpleFraction(right, maxDecimals), options));
+          values.push(
+            arctan(toSimpleFraction(right, maxDecimals), maxDecimals),
+          );
           return;
         }
         case "arctanh": {
-          values.push(arctanh(toSimpleFraction(right, maxDecimals), options));
+          values.push(
+            arctanh(toSimpleFraction(right, maxDecimals), maxDecimals),
+          );
           return;
         }
         case "ln": {
-          values.push(ln(right, options));
+          values.push(ln(right, maxDecimals));
           return;
         }
         case "exp": {
-          values.push(exp(right, options));
+          values.push(exp(right, maxDecimals));
           return;
         }
         case "sin": {
-          values.push(sin(right, options));
+          values.push(sin(right, maxDecimals));
           return;
         }
         case "cos": {
-          values.push(cos(right, options));
+          values.push(cos(right, maxDecimals));
           return;
         }
       }
@@ -202,7 +206,7 @@ export function evaluate(
         return;
       }
       case "EXP": {
-        values.push(exponentiate(left, right, options));
+        values.push(exponentiate(left, right, maxDecimals));
         return;
       }
     }

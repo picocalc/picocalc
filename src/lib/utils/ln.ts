@@ -1,12 +1,12 @@
 import { InterpreterRangeError } from "#lib/errors";
-import type { NormalValue, PrecisionOptions } from "#lib/types";
+import type { NormalValue } from "#lib/types";
 
 import { arctanh } from "./arctanh";
 import { ONE } from "./constants";
 import { simplify, toSimpleFraction } from "./simplify";
 import { sqrt } from "./sqrt";
 
-function ln(v: NormalValue, precision: PrecisionOptions): NormalValue {
+function ln(v: NormalValue, maxDecimals?: number): NormalValue {
   const { n, d, c, e } = v;
 
   if (n <= 0n || d <= 0n) {
@@ -30,13 +30,13 @@ function ln(v: NormalValue, precision: PrecisionOptions): NormalValue {
   // Argument reduction: bring value close to 1 via sqrt
   // While x >= 2, x = sqrt(x), accumulating factor 2^m
   while (sN >= 2n * sD) {
-    const val = sqrt({ n: sN, d: sD }, precision);
+    const val = sqrt({ n: sN, d: sD }, maxDecimals);
     sN = val.n;
     sD = val.d;
     m++;
   }
 
-  const at = arctanh({ n: sN - sD, d: sN + sD }, precision);
+  const at = arctanh({ n: sN - sD, d: sN + sD }, maxDecimals);
 
   let rN = at.n * 2n;
 

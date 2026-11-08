@@ -1,6 +1,6 @@
 import { DivisionByZeroError, NotImplementedError } from "#lib/errors";
-import { getPrecisionDigits } from "#lib/options";
-import type { NormalValue, PrecisionOptions } from "#lib/types";
+import { getBitPrecision } from "#lib/options";
+import type { NormalValue } from "#lib/types";
 
 import { ZERO } from "./constants";
 import { simplify, toSimpleFraction } from "./simplify";
@@ -41,7 +41,7 @@ function iNthRoot(value: bigint, n: bigint): bigint {
 export function nthRoot(
   v: NormalValue,
   n: bigint,
-  precision: PrecisionOptions,
+  maxDecimals?: number,
 ): NormalValue {
   if (n === 0n) throw new DivisionByZeroError();
   if (n === 1n) return v;
@@ -54,29 +54,26 @@ export function nthRoot(
       );
     }
     // For odd roots: nthRoot(-x) = -nthRoot(x)
-    const positiveResult = nthRoot({ n: -v.n, d: v.d }, n, precision);
-    return { n: -positiveResult.n, d: positiveResult.d };
+    const r = nthRoot({ n: -v.n, d: v.d }, n, maxDecimals);
+    return { n: -r.n, d: r.d };
   }
 
   if (v.n === 0n) return ZERO;
 
   const rootN = iNthRoot(v.n, n);
   const rootD = iNthRoot(v.d, n);
+
   if (rootN ** n === v.n && rootD ** n === v.d) {
     const e = simplify({ n: v.e?.n ?? 1n, d: (v.e?.d ?? 1n) * n });
     return simplify({ n: rootN, d: rootD, c: v.c, e });
   }
 
-  const precisionDigits = getPrecisionDigits(precision.maxDecimals);
+  const precisionBits = getBitPrecision(maxDecimals);
 
-  const scalePower = BigInt(precisionDigits) * n;
-  const scaleFactor = 10n ** scalePower;
+  const scaleFactor = 1n << (precisionBits * n);
 
   const s = toSimpleFraction(v);
   const scaledValue = (s.n * scaleFactor) / s.d;
 
-  const resultN = iNthRoot(scaledValue, n);
-  const resultD = 10n ** BigInt(precisionDigits);
-
-  return simplify({ n: resultN, d: resultD });
+  return simplify({ n: iNthRoot(scaledValue, n), d: 1n << precisionBits });
 }
