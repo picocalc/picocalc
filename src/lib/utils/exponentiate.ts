@@ -1,8 +1,9 @@
-import { DivisionByZeroError } from "#lib/errors";
+import { DivisionByZeroError, NotImplementedError } from "#lib/errors";
 import { getPrecisionDigits } from "#lib/options";
 import type { PrecisionOptions, Value } from "#lib/types";
 import { OverflowValue } from "#lib/types";
 
+import { negate } from "./add";
 import { ONE, ZERO } from "./constants";
 import { rawExp } from "./exp";
 import { ln } from "./ln";
@@ -47,23 +48,35 @@ export function exponentiate(
     return ZERO;
   }
 
-  if (dExp >= 100) {
+  if (dExp >= 100 && (lN !== 1n || rS.c)) {
     const maxDecimals = getPrecisionDigits(precision.maxDecimals);
-    const lS = toSimpleFraction(left, maxDecimals);
-    const rS = toSimpleFraction(right, maxDecimals);
 
-    try {
-      const lnBase = ln(lS, { maxDecimals });
-      const SCALE = 10n ** BigInt(maxDecimals);
-      const lnBaseScaled = (lnBase.n * SCALE) / lnBase.d;
-      const rightScaled = (rS.n * SCALE) / rS.d;
-      const productScaled = (lnBaseScaled * rightScaled) / SCALE;
+    const isNegativeBase = lN < 0;
 
-      const productVal = { n: productScaled, d: SCALE };
-      return rawExp(productVal, precision);
-    } catch {
-      return OverflowValue;
+    if (isNegativeBase && dExp % 2n === 0n) {
+      throw new NotImplementedError(
+        `Even (${dExp}th) root of negative numbers is not implemented yet.`,
+      );
     }
+
+    const lAbs = isNegativeBase ? negate(left) : left;
+    const lS = toSimpleFraction(lAbs, maxDecimals);
+    const r = toSimpleFraction(rS, maxDecimals);
+
+    const lnBase = ln(lS, { maxDecimals });
+    const SCALE = 10n ** BigInt(maxDecimals);
+    const lnBaseScaled = (lnBase.n * SCALE) / lnBase.d;
+    const rightScaled = (r.n * SCALE) / r.d;
+    const productScaled = (lnBaseScaled * rightScaled) / SCALE;
+
+    const productVal = { n: productScaled, d: SCALE };
+    const result = rawExp(productVal, precision);
+
+    if (isNegativeBase && normalizedExp.n % 2n !== 0n) {
+      return negate(result);
+    }
+
+    return result;
   }
 
   const eN = (left.e?.n ?? 1n) * exponent;

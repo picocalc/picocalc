@@ -5,7 +5,6 @@ import {
   EmptyExpressionError,
   InterpreterRangeError,
   MaximumPrecisionError,
-  MismatchedParenthesisError,
   OverflowError,
 } from "#lib/errors";
 import { calculate } from "#src";
@@ -170,8 +169,9 @@ describe("evaluate", () => {
     expect(calculate("(1+2)(3+4)")).toBe("21");
   });
 
-  it("should allow missing closing parenthesis", () => {
+  it("should allow missing open and closing parenthesis", () => {
     expect(calculate("(1 + 2")).toBe("3");
+    expect(calculate("1 + 2)")).toBe("3");
   });
 
   it("should throw DivisionByZeroError for division by 0", () => {
@@ -754,6 +754,8 @@ describe("evaluate", () => {
     expect(calculate("pi^(5/2)", { format: "precise" })).toBe("pi^(5/2)");
     expect(calculate("pi^(3/2)", { format: "precise" })).toBe("pi^(3/2)");
     expect(calculate("pi^(3/4)", { format: "precise" })).toBe("pi^(3/4)");
+    expect(calculate("pi^(1/1000)", { format: "precise" })).toBe("pi^(1/1000)");
+    expect(calculate("exp(1/1000)", { format: "precise" })).toBe("e^(1/1000)");
     expect(calculate("sqrt(pi)", { format: "precise" })).toBe("sqrt(pi)");
     expect(calculate("sqrt(pi) * sqrt(pi)", { format: "precise" })).toBe("pi");
     expect(calculate("sqrt(pi) * pi", { format: "precise" })).toBe("pi^(3/2)");
@@ -959,10 +961,6 @@ describe("evaluate", () => {
 });
 
 describe("evaluate - error handling", () => {
-  it("should throw MismatchedParenthesisError for extra closing parenthesis", () => {
-    expect(() => calculate("1 + 2)")).toThrow(MismatchedParenthesisError);
-  });
-
   it("should throw EmptyExpressionError for empty expression", () => {
     expect(() => calculate("")).toThrow(EmptyExpressionError);
     expect(() => calculate(" ")).toThrow(EmptyExpressionError);

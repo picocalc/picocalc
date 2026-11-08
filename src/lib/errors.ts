@@ -54,9 +54,3 @@ export class InterpreterRangeError extends InterpreterError {
     super(message);
   }
 }
-
-export class MismatchedParenthesisError extends InterpreterError {
-  constructor(pos: number, message: string = "Mismatched parenthesis") {
-    super(message, pos);
-  }
-}

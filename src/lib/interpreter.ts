@@ -1,5 +1,4 @@
 import {
-  MismatchedParenthesisError,
   EmptyExpressionError,
   MaximumPrecisionError,
   OverflowError,
@@ -275,15 +274,12 @@ export function evaluate(
         break;
       }
       case "RPAREN": {
-        let foundMatch = false;
         while (ops.length > 0) {
           if (ops.at(-1) === "LPAREN") {
-            foundMatch = true;
             break;
           }
           applyOp(token.pos);
         }
-        if (!foundMatch) throw new MismatchedParenthesisError(token.pos);
         ops.pop();
         const nextOp = ops.at(-1);
         if (!nextOp) break;
