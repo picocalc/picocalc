@@ -1,6 +1,8 @@
+import { powBitLength } from "bigint.bitlength";
+
 import { DivisionByZeroError, NotImplementedError } from "#lib/errors";
 import { getBitPrecision } from "#lib/options";
-import { MAX_EXPONENT_RESULT_DIGITS } from "#lib/options";
+import { MAX_EXPONENT_RESULT_BITS } from "#lib/options";
 import type { NormalValue, Value } from "#lib/types";
 import { OverflowValue } from "#lib/types";
 
@@ -127,8 +129,8 @@ function exponentiate(left: Value, right: Value, maxDecimals?: number): Value {
     const p = (lnBaseScaled * rightScaled) / scale;
     const pAbs = p < 0 ? -p : p;
     if (
-      scale > pAbs * MAX_EXPONENT_RESULT_DIGITS ||
-      pAbs > scale * MAX_EXPONENT_RESULT_DIGITS
+      scale > pAbs * MAX_EXPONENT_RESULT_BITS ||
+      pAbs > scale * MAX_EXPONENT_RESULT_BITS
     ) {
       return OverflowValue;
     }
@@ -152,13 +154,9 @@ function exponentiate(left: Value, right: Value, maxDecimals?: number): Value {
     [baseN, baseD] = [baseD, baseN];
   }
 
-  const baseNDigits = BigInt.bitLength(baseN);
-  const baseDDigits = BigInt.bitLength(baseD);
-
   if (
-    baseNDigits * exponent > MAX_EXPONENT_RESULT_DIGITS ||
-    baseDDigits * exponent > MAX_EXPONENT_RESULT_DIGITS ||
-    ((baseNDigits > 5000 || baseDDigits > 5000) && exponent > 10)
+    powBitLength(baseN, exponent) > MAX_EXPONENT_RESULT_BITS ||
+    powBitLength(baseD, exponent) > MAX_EXPONENT_RESULT_BITS
   ) {
     return OverflowValue;
   }

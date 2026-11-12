@@ -1,4 +1,3 @@
-import "bigint.bitlength";
 import { evaluate } from "./lib/interpreter";
 import { tokenize } from "./lib/lexer";
 import { parse } from "./lib/parser";
