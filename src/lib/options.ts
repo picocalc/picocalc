@@ -26,7 +26,7 @@ const MAX_SCIENTIFIC_NUMBER_EXPONENT = 3e5;
 /**
  * Maximum digits allowed for the result of exponentiation
  */
-const MAX_EXPONENT_RESULT_DIGITS = 10_000_000n;
+const MAX_EXPONENT_RESULT_BITS = 500_000n;
 
 export {
   MAX_DECIMALS,
@@ -35,5 +35,5 @@ export {
   MAX_FACTORIAL,
   MAX_PRECISION,
   MAX_SCIENTIFIC_NUMBER_EXPONENT,
-  MAX_EXPONENT_RESULT_DIGITS,
+  MAX_EXPONENT_RESULT_BITS,
 };

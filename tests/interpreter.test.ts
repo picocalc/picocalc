@@ -1000,10 +1000,17 @@ describe("evaluate - error handling", () => {
 
     it("should throw OverflowError for very large exponentiation", () => {
       expect(() => calculate("3e5!^5")).toThrow(OverflowError);
-      expect(() => calculate("(10^2000)^100")).toThrow(OverflowError);
-      expect(() => calculate("(10^2e5)^1000")).toThrow(OverflowError);
+      expect(() => calculate("(10^2e3)^100")).toThrow(OverflowError);
+      expect(() => calculate("(10^2e4)^10")).toThrow(OverflowError);
+      expect(() => calculate("(10^1e5)^2")).toThrow(OverflowError);
+      expect(() => calculate("(10^2e5)")).toThrow(OverflowError);
+      expect(() => calculate("(10^5e3)^100")).toThrow(OverflowError);
+      expect(() => calculate("(10^5e4)^10")).toThrow(OverflowError);
+      expect(() => calculate("(10^2e5)^2")).toThrow(OverflowError);
+      expect(() => calculate("(10^2e5)^10")).toThrow(OverflowError);
+      expect(() => calculate("(10^2e5)^1e3")).toThrow(OverflowError);
       expect(() => calculate("1e10000000")).toThrow(OverflowError);
-      expect(() => calculate("10^10^10")).toThrow(OverflowError);
+      expect(() => calculate("10^10e10")).toThrow(OverflowError);
     }, 200);
 
     it("should throw OverflowError when further handling overflowing numbers", () => {
@@ -1029,11 +1036,13 @@ describe("evaluate - error handling", () => {
 });
 
 describe.skipIf(win32)("evaluate - large operations", () => {
-  describe("large exponentiation", () => {
-    it("should not throw OverflowError for not large exponentiation", () => {
-      expect(() => calculate("(10^2e5)^10")).not.toThrow(OverflowError);
-    });
-  });
+  it("should not throw OverflowError for not large exponentiation", () => {
+    expect(() => calculate("(10^1e3)^100")).not.toThrow(OverflowError);
+    expect(() => calculate("(10^2e3)^50")).not.toThrow(OverflowError);
+    expect(() => calculate("(10^2e4)^5")).not.toThrow(OverflowError);
+    expect(() => calculate("(10^5e4)^2")).not.toThrow(OverflowError);
+    expect(() => calculate("(10^1e5)")).not.toThrow(OverflowError);
+  }, 2000);
 
   describe("adding a lot of numbers", () => {
     const getTest = (numbers: number) => {

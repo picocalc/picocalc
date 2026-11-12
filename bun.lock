@@ -5,7 +5,7 @@
     "": {
       "name": "picocalc",
       "dependencies": {
-        "bigint.bitlength": "0.2.0",
+        "bigint.bitlength": "0.3.0",
       },
       "devDependencies": {
         "@gameroman/config": "0.3.0",
@@ -201,7 +201,7 @@
 
     "@yuku-toolchain/win32-x64": ["@yuku-toolchain/win32-x64@0.25.0", "", { "os": "win32", "cpu": "x64" }, "sha512-drLnLlLtqLni1UPZJ1pKl6PPsdGJoaFGaQsJa1khtjJT+OK5Z71rb+md9fO6KP9eJXjIOJKtW7OgnVlLf91WIw=="],
 
-    "bigint.bitlength": ["bigint.bitlength@0.2.0", "", {}, "sha512-ZwgOg11V4h5zDx1zExdTGIlV2iOvIO/7524WUSyKGjK86dOReAIZ4LWgKHXmjNrjqPchJjKRNMNSxojRQW6WPw=="],
+    "bigint.bitlength": ["bigint.bitlength@0.3.0", "", {}, "sha512-z7OQvZ3iQo1PoBhqaHOR8F/wvfP5NIOdqMKbwFUaj5k6E1RLO4ph98WXJokOj5zUuL2DVuyhZ71VVFle+QC6VQ=="],
 
     "bun-types": ["bun-types@1.4.4", "", { "dependencies": { "@types/node": "*", "undici-types": "*" } }, "sha512-yjrJh5oGX7mMPKGd19YXyIjmEuj4G4zNC30bs7PM9Az7NQ3ndF3j6hbeRdvJTRQEhJ/FYQwW0a2moweEi2hMxQ=="],
 
@@ -258,7 +258,5 @@
     "verkit": ["verkit@0.5.0", "", {}, "sha512-u4J1hr6Y+C/hit34GwL3eIcUf3wngT8TlYUjK7tk0jxydKLAq3sYvifjdTDA6U3KCKRcQCQDGf/srjxfZF3l7g=="],
 
     "yuku": ["yuku@0.25.0", "", { "optionalDependencies": { "@yuku-toolchain/darwin-arm64": "0.25.0", "@yuku-toolchain/darwin-x64": "0.25.0", "@yuku-toolchain/linux-arm64": "0.25.0", "@yuku-toolchain/linux-x64": "0.25.0", "@yuku-toolchain/win32-arm64": "0.25.0", "@yuku-toolchain/win32-x64": "0.25.0" }, "peerDependencies": { "@yuku-toolchain/wasm": "0.25.0" }, "optionalPeers": ["@yuku-toolchain/wasm"] }, "sha512-iAlHlpPmcjRqUauDkW9xF33b+jsUzTrrv49FfPLBNxEAUWuU7XN8tBUGjBHYPCEF/d3632MhG6GjCZutecA8Ng=="],
-
-    "tinyglobby/picomatch": ["picomatch@4.0.5", "", {}, "sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A=="],
   }
 }
